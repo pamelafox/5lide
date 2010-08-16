@@ -1,0 +1,21 @@
+body {
+  font-family: 'Tangerine', serif;
+  font-size: 2em;
+  color: white;
+  font-weight: bold;
+}
+
+.presentation {
+  background-image: url('/static/images/background_ballerina.jpg');
+}
+
+.slide {
+  background-color: #eee;
+  background: -webkit-gradient(linear, left bottom, left top, from(#AB37A3), to(#E89BEB));
+  background: -moz-linear-gradient(bottom, #AB37A3, #E89BEB);
+  background: linear-gradient(bottom, #AB37A3, #E89BEB);
+}
+
+.slide .intro {
+  text-align: center;
+}

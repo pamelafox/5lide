@@ -1,0 +1,21 @@
+body {
+  font-size: 2em;
+  color: white;
+  font-weight: bold;
+}
+
+.presentation {
+  background: #31597b;
+}
+
+.slide {
+  border: 3px solid white;
+  background-color: #A4C639;
+  background: -webkit-gradient(linear, left bottom, left top, from(#A4C639), to(#A4C639));
+  background: -moz-linear-gradient(bottom, #A4C639, #A4C639);
+  background: linear-gradient(bottom, #A4C639, #A4C639);
+}
+
+.slide .intro {
+  text-align: center;
+}

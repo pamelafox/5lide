@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <script type="text/javascript">
+  //<![CDATA[
+
+  function newSlideSet() {
+    var form = document.getElementById("slidesetform");
+    var dialog = document.getElementById("slidesetform_dialog");
+    DialogBox.instance().show(dialog, function() {
+      form["name"].focus();
+    });
+  }
+
+  function selectLists(all) {
+    var inputs = document.getElementsByTagName("input");
+    for (var i = 0; i < inputs.length; i++) {
+      var input = inputs[i];
+      if (input.type == "checkbox" && input.className == "listcheckbox") {
+        var id = input.id.substring(8);
+        var row = document.getElementById("row" + id);
+        input.checked = all;
+        updateHighlight(input, row);
+      }
+    }
+  }
+
+  function updateHighlight(checkbox, row) {
+    if (checkbox.checked) {
+      row.style.backgroundColor = "#ffffcc";
+    } else {
+      row.style.backgroundColor = "white";
+    }
+  }
+
+  //]]>
+  </script>
+{% endblock %}
+
+{% block body %}
+  <form action="/inboxaction.do" method="post">
+    <div class="inbox">
+      <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
+      <div class="menu">
+        <span class="item"><a href="javascript:newSlideSet()">New Slide Set</a></span>
+      </div>
+      <div class="buttons top">
+        <div class="left corner"></div>
+        <div class="right corner"></div>
+        <div class="info">
+          <span class="count">{{ sets|length }} sets</span>
+        </div>
+        <span class="button"><input type="submit" name="action" value="Delete" onclick="return confirm('Are you sure you want to permanently delete the selected task sets?')"/></span>
+      </div>
+      <div class="table">
+        <table>
+          <tr>
+            <th class="checkbox"><input type="checkbox" onclick="selectLists(this.checked)"/></th>
+            <th>Slide Sets</th>
+            <th>Collaborators</th>
+            <th>Last Edited</th>
+          </tr>
+          </tr>
+          {% for list in sets %}
+            <tr id="row{{ forloop.counter }}">
+              <td class="checkbox"><input class="listcheckbox" type="checkbox" name="list" value="{{ list.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
+              <td class="main">
+                <div class="name"><a {% if not list.archived %}class="active"{%endif %} href="/list?id={{ list.key|stringformat:"s"|urlencode }}">{{ list.name|escape }}</a></div>
+              </td>
+              <td class="members">
+                {% for member in list.slidesetmember_set %}
+                  {% ifequal member.user.email user.email %}
+                    Me
+                  {% else %}
+                    {{ member.user.nickname }}
+                  {% endifequal %}
+                  {% if not forloop.last %}/{% endif %}
+                {% endfor %}
+              </td>
+              <td class="date">
+                {{ list.updated|date:"D, M j, Y \a\t P" }}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        {% if not sets %}
+          <div class="message">You don't have any slide sets. To get started, <a href="javascript:newSlideSet()">create a new set</a>.</div>
+        {% else %}
+        {% endif %}
+      </div>
+      <div class="buttons bottom">
+        <div class="left corner"></div>
+        <div class="right corner"></div>
+        <span class="button"><input type="submit" name="action" value="Delete"/></span>
+      </div>
+    </div>
+  </form>
+
+  <div id="slidesetform_dialog" class="dialog" style="display: none">
+    <div class="title">New Slide Set</div>
+    <div class="content">
+      <form action="/createslideset.do" method="post" id="slidesetform">
+        <div class="form">
+          <input type="hidden" name="task" value=""/>
+          <div class="field">
+            <div class="name">Name</div>
+            <div class="value"><input name="name" type="text" size="70"/></div>
+          </div>
+          <div class="buttons">
+            <span class="button"><input type="submit" name="action" value="Create Slide Set"/></span>
+            <span class="button"><input type="button" value="Cancel" onclick="DialogBox.instance().close()"/></span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block footer %}
+  {% if debug %}
+    <script src="/static/javascript/debug/browser.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/dialog.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/dom.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/drag.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/event.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/io.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/lang.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/offscreen.js" type="text/javascript"></script>
+    <script src="/static/javascript/debug/slideset.js" type="text/javascript"></script>
+  {% else %}
+    <script src="/static/javascript/slides.js" type="text/javascript"></script>
+  {% endif %}
+{% endblock %}

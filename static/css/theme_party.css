@@ -1,0 +1,17 @@
+body {
+  font-size: 2em;
+  color: black;
+  font-weight: bold;
+}
+
+.presentation {
+  background: #0000ff;
+}
+
+.slide {
+  border: 3px solid black;
+  background-color: #66FF66;
+  background: -webkit-gradient(linear, left bottom, left top, from(#66FF66), to(#66FF66));
+  background: -moz-linear-gradient(bottom, #66FF66, #66FF66);
+  background: linear-gradient(bottom, #66FF66, #66FF66);
+}
