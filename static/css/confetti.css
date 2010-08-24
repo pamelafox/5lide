@@ -1,0 +1,73 @@
+
+		
+		.confetti {
+			position: absolute;
+			text-align: center;
+			z-index: 9999;
+			top: -100px;
+			width: 1em;
+			height: 1em;
+			color: white;
+			font-size: 16px;
+			text-shadow: rgba(0, 0, 0, 0.7) 1px 1px 2px;
+
+			-webkit-animation-iteration-count: infinite, 20;
+			-webkit-animation-direction: normal, normal;
+			-webkit-animation-timing-function: linear, ease-in;
+		}
+
+		.confetti span {
+			position: absolute;
+			display: block;
+			width: 1em;
+			height: 1em;
+
+			-webkit-animation-iteration-count: infinite;
+			-webkit-animation-direction: alternate;
+			-webkit-animation-timing-function: ease-in-out;
+			-webkit-transform-origin: 50% -100%;
+
+		}
+
+		.confetti.tiny {
+			font-size: 0.5em;
+		}
+
+		.confetti.small {
+			font-size: 1em;
+		}
+
+		.confetti.medium {
+			font-size: 2em;
+		}
+
+		.confetti.large {
+			font-size: 3em;
+		}
+
+		.confetti.massive {
+			font-size: 7em;
+		}
+
+		@-webkit-keyframes fade {
+			/* Show a confetti while into or below 85 percent of the animation and hide it, otherwise */
+			0%   { opacity: 1; }
+			80%  { opacity: 1; }
+			100% { opacity: 0; }
+		}
+
+		@-webkit-keyframes drop {
+			0%   { -webkit-transform: translate(0px, -40px); }
+			100% { -webkit-transform: translate(0px, 700px); }
+		}
+
+		@-webkit-keyframes clockwiseSpin {
+			0%   { -webkit-transform: rotate(-70deg); }
+			100% { -webkit-transform: rotate(70deg); }
+		}
+
+
+		@-webkit-keyframes counterclockwiseSpin  {
+			0%   { -webkit-transform: rotate(75deg); }
+			100% { -webkit-transform: rotate(-75deg); }
+		}

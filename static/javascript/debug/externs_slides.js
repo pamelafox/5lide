@@ -1,5 +1,4 @@
 // Copyright 2006 Google Inc.
-// All Rights Reserved.
 //
 // Author: Bret Taylor
 
@@ -42,11 +41,3 @@ function Image(opt_width, opt_height) {}
 function XMLHttpRequest() {}
 function XMLSerializer() {}
 function XSLTProcessor() {}
-
-var methods_ = {};
-methods_.show;
-methods_.showDialog;
-methods_.parseList;
-methods_.log;
-methods_.newTask;
-

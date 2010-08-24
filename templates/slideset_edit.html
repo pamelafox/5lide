@@ -16,17 +16,15 @@
   {% else %}
     <script src="/static/javascript/slides.js" type="text/javascript"></script>
   {% endif %}
-
-  {% if task_list.published %}
-    <link rel="alternate" type="application/atom+xml" title="{{ task_list.name|escape }}" href="{{ request.path }}?id={{ task_list.key|stringformat:"s"|urlencode }}&amp;output=atom"/>
+  {% if slide_set.published %}
+    <link rel="alternate" type="application/atom+xml" title="{{ slide_set.name|escape }}" href="{{ request.path }}?id={{ slide_set.key|stringformat:"s"|urlencode }}&amp;output=atom"/>
   {% endif %}
-
   <script type="text/javascript">
   //<![CDATA[
   function closeDialog() {
     DialogBox.instance().close();
   }
-  
+
   function newCollaborator() {
     var form = document.getElementById("memberform");
     var dialog = document.getElementById("memberform_dialog");
@@ -39,11 +37,7 @@
     var dialog = document.getElementById("theme_dialog");
     DialogBox.instance().show(dialog);
   }
-  
-  function viewSlides() {
-    window.location.href = window.location.href + "&output=slide";
-  }
-  
+
   function publishSlideSet(button) {
     var publish = button.value == "Publish";
     if (publish) {
@@ -58,7 +52,7 @@
     var dialog = document.getElementById("slidetype_dialog");
     DialogBox.instance().show(dialog);
   }
-   
+
   function doPublish(publish) {
     var dialog = document.getElementById("publishform_dialog");
     var info = document.getElementById("publish_info");
@@ -114,21 +108,16 @@
     padding-left: 0.5em;
   }
 
-  h1 {
-    font-size: large;
-    margin: 0;
-  }
-
-  .inbox {
+  .slidesarea {
     clear: both;
     margin-top: 0.5em;
   }
 
-  .inbox .top {
+  .slidesarea .top {
     margin-bottom: 5px;
   }
 
-  .inbox .task table td {
+  .slidesarea .slide table td {
     border-bottom: 0;
     padding-bottom: 3px;
     padding-top: 3px;
@@ -152,23 +141,23 @@
     text-decoration: underline;
     color: #0000cc;
   }
-  
+
   .titlecol {
     width: 20%;
   }
-  
+
   .subtitlecol {
     width: 20%;
   }
-  
+
   .contentcol {
     width: 50%;
-  }    
-  
+  }
+
   .typecol {
     width: 40px;
   }
-  
+
   .typecol img {
     width: 35px;
     border: 1px solid grey;
@@ -196,14 +185,15 @@
   <h1>{{ slide_set.name|escape }}</h1>
 
   <form action="/slideset.do" method="post">
-    <div class="inbox">
+    <div class="slidesarea">
       <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
       <div class="buttons top">
         <div class="left corner"></div>
         <div class="right corner"></div>
         <div class="info">
-          <span class="count">{{ slides|length }} slides</span>
-          <span class="button"><input type="button" value="View as Slideshow" onclick="viewSlides(this)"/></span>
+          <span class="count">{{ slides|length }} slide(s)</span>
+          |
+          <span class="button"><a href="{{ request.uri|escape }}&amp;output=slide">View as Slideshow</a></span>
         </div>
         <span class="button"><input id="theme_button" type="button" value="Change Theme" onclick="changeTheme(this)"/></span>
         <span class="button"><input id="publish_button" type="button" value="{% if slide_set.published %}Unpublish{% else %}Publish{% endif %}" onclick="publishSlideSet(this)"/></span>
@@ -218,7 +208,6 @@
         <td class="subtitlecol">subtitle</td>
         <td class="contentcol">content</td></tr>
         </table>
-        
         </div>
         <div class="newslideset" style="cursor: pointer" onclick="newSlide()"><img src="/static/images/zip-plus.gif" style="width: 14px; height: 14px"> <span class="text">New slide</span></div>
         {% if not slides %}
@@ -229,7 +218,7 @@
       </div>
     </div>
   </form>
-  
+
   <div id="memberform_dialog" class="dialog" style="display: none">
     <div class="title">New Collaborator</div>
     <div class="content">
@@ -262,7 +251,7 @@
       </div>
     </div>
   </div>
-  
+
   <div id="slidetype_dialog" class="dialog" style="display: none">
     <div class="title">Pick Slide Type</div>
     <div class="content">
@@ -281,7 +270,6 @@
     <div class="title">Change Theme</div>
     <div class="content">
       <div class="form">
-        
         <input type="image" style="width:80px;height:60px" src="/static/images/theme_normal.png"  onclick="slideSet.changeTheme('normal');  closeDialog();">
         <input type="image" style="width:80px;height:60px" src="/static/images/theme_ballerina.png" onclick="slideSet.changeTheme('ballerina'); closeDialog();">
         <input type="image" style="width:80px;height:60px" src="/static/images/theme_android.png"  onclick= "slideSet.changeTheme('android');  closeDialog();">
@@ -292,7 +280,7 @@
         </div>
      </div>
    </div>
-   
+
 {% endblock %}
 
 {% block footer %}
@@ -304,7 +292,7 @@
       [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title}}", "{{slide.subtitle}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
     {% endfor %}
   ]));
-  slideSet.attach(document.getElementById("container"));
+  slideSet.attachToDOM(document.getElementById("container"));
 
   </script>
 {% endblock %}

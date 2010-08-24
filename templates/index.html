@@ -39,7 +39,7 @@
 
 {% block body %}
   <form action="/inboxaction.do" method="post">
-    <div class="inbox">
+    <div class="slidesarea">
       <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
       <div class="menu">
         <span class="item"><a href="javascript:newSlideSet()">New Slide Set</a></span>
@@ -50,7 +50,7 @@
         <div class="info">
           <span class="count">{{ sets|length }} sets</span>
         </div>
-        <span class="button"><input type="submit" name="action" value="Delete" onclick="return confirm('Are you sure you want to permanently delete the selected task sets?')"/></span>
+        <span class="button"><input type="submit" name="action" value="Delete" onclick="return confirm('Are you sure you want to permanently delete the selected slide sets?')"/></span>
       </div>
       <div class="table">
         <table>
@@ -101,7 +101,7 @@
     <div class="content">
       <form action="/createslideset.do" method="post" id="slidesetform">
         <div class="form">
-          <input type="hidden" name="task" value=""/>
+          <input type="hidden" name="slide" value=""/>
           <div class="field">
             <div class="name">Name</div>
             <div class="value"><input name="name" type="text" size="70"/></div>

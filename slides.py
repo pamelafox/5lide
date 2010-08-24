@@ -43,7 +43,7 @@ template.register_template_library('templatefilters')
 class SlideSet(db.Model):
   """A SlideSet is that encompasses all the slides.
 
-  Other than the tasks referring to it, a SlideSet just has meta-data, like
+  Other than the slides referring to it, a SlideSet just has meta-data, like
   whether it is published and the date at which it was last updated.
   """
   name = db.StringProperty(required=True)
@@ -125,7 +125,7 @@ class BaseRequestHandler(webapp.RequestHandler):
         'login_url': users.create_login_url(self.request.uri),
         'logout_url': users.create_logout_url('http://%s/' % (
             self.request.host,)),
-        'debug': True,
+        'debug': False,
         'application_name': 'Task Manager',}
     values.update(template_values)
     directory = os.path.dirname(__file__)
@@ -185,7 +185,6 @@ class SlideSetPage(BaseRequestHandler):
           self.error(403)
         return
 
-    # Filter out archived tasks by default
     slides = list(slide_set.slide_set.order('-index').order('created'))
 
     self.response.headers['Content-Type'] = output_type[0]
@@ -216,7 +215,7 @@ class CreateSlideSetAction(BaseRequestHandler):
 
 
 class EditSlideAction(BaseRequestHandler):
-  """Edits a specific task, changing its description.
+  """Edits a specific slide, changing its description.
 
   We also updated the last modified date of the slide set so that the
   slide set inbox shows the correct last modified date for the list.

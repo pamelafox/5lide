@@ -43,18 +43,18 @@ Slide.parseList = function(list) {
 
 // Attaches this slide to the given element container, creating the DOM
 // elements representing this slide.
-Slide.prototype.attach = function(container) {
+Slide.prototype.attachToDOM = function(container) {
   var element = this.createElement_("div", container, "slide");
   element.style.position = "relative";
 
   var table = this.createElement_("table", element);
   var tbody = this.createElement_("tbody", table);
   var tr = this.createElement_("tr", tbody);
-  
+
   var typeCell = this.createElement_("td", tr, "typecol");
   var typeImg = this.createElement_("img", typeCell);
   typeImg.src = "/static/images/type_" + this.type_ + ".png";
-  
+
   var titleCell = this.createElement_("td", tr, "titlecol");
   this.titleContainer_ = this.createElement_("input", titleCell);
   this.titleContainer_.style.position = "relative";
@@ -62,26 +62,25 @@ Slide.prototype.attach = function(container) {
   Event.addListener(this.titleContainer_, "keypress", callback(this, this.onEditKeyPress_));
   Event.addListener(this.titleContainer_, "blur", callback(this, this.saveEdit_));
   Event.addListener(this.titleContainer_, "mousedown", stopEvent);
-  
+
    // Make subtitle cell
   var subtitleCell = this.createElement_("td", tr, "subtitlecol");
   this.subtitleContainer_ = this.createElement_("input", subtitleCell);
-  if (this.type_ == Slide.TYPE_NORMAL) this.subtitleContainer_.disabled = true;
+  if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
   Event.addListener(this.subtitleContainer_, "keypress", callback(this, this.onEditKeyPress_));
   Event.addListener(this.subtitleContainer_, "blur", callback(this, this.saveEdit_));
   Event.addListener(this.subtitleContainer_, "mousedown", stopEvent);
   this.subtitleContainer_.value = this.subtitle_ || "";
-  
+
   // Make content input
   var contentCell = this.createElement_("td", tr, "contentcol");
   this.contentContainer_ = this.createElement_("textarea", contentCell);
   this.contentContainer_.style.width = "60%";
   if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
-  Event.addListener(this.contentContainer_, "keypress", callback(this, this.onEditKeyPress_));
   Event.addListener(this.contentContainer_, "blur", callback(this, this.saveEdit_));
   Event.addListener(this.contentContainer_, "mousedown", stopEvent);
   this.contentContainer_.value = this.content_ || "";
-  
+
 
   // Enable drag positioning of this slide
   var dragger = new Dragger(element, true);
@@ -91,6 +90,7 @@ Slide.prototype.attach = function(container) {
   Event.addListener(dragger, "click", callback(this, this.edit));
 
   this.element_ = element;
+  enableSelection(this.element_);
   return element;
 }
 
@@ -115,7 +115,7 @@ Slide.prototype.saveEdit_ = function() {
   var contentChanged = this.contentContainer_ && this.contentContainer_.value != this.content_;
   if (contentChanged) this.content_ = this.contentContainer_.value;
   var changed = contentChanged || subtitleChanged || titleChanged;
-  
+
   if (changed) {
     this.save();
   }
@@ -230,7 +230,7 @@ function SlideSet(key, slides) {
 }
 
 // Draws this slide list in the given container.
-SlideSet.prototype.attach = function(container) {
+SlideSet.prototype.attachToDOM = function(container) {
   var element = document.createElement("div");
   element.className = "slidelist";
   element.style.position = "relative";
@@ -240,7 +240,7 @@ SlideSet.prototype.attach = function(container) {
   for (var i = 0; i < this.slides_.length; i++) {
     var slide = this.slides_[i];
     order.push(slide.key());
-    var slideElement = slide.attach(element);
+    var slideElement = slide.attachToDOM(element);
     slideElement.slide = slide;
     Event.addListener(slide, "positionchanged",
                       callback(this, this.savePositions_));
@@ -291,17 +291,30 @@ SlideSet.prototype.changeTheme = function(theme) {
 SlideSet.prototype.newSlide = function(type) {
   var slide = new Slide(this.key_, null, type, "", "", "");
   this.slides_.push(slide);
-  var slideElement = slide.attach(this.element_);
+  var slideElement = slide.attachToDOM(this.element_);
   slideElement.slide = slide;
   Event.addListener(slide, "positionchanged",
                     callback(this, this.savePositions_));
 }
 
-// Export our API symbols
+// Mimics goog.exportSymbol and goog.exportProperty from base.js
 function exportSymbol(name, symbol) {
   window[name] = symbol;
 }
+
+function exportProperty(object, publicName, symbol) {
+  object[publicName] = symbol;
+}
+
 exportSymbol("Slide", Slide);
+exportProperty(Slide, "parseList", Slide.parseList);
+exportProperty(Slide, "attachToDOM", Slide.attachToDOM);
+exportProperty(Slide, "save", Slide.save);
 exportSymbol("SlideSet", SlideSet);
+exportProperty(SlideSet.prototype, "attachToDOM", SlideSet.prototype.attachToDOM);
+exportProperty(SlideSet.prototype, "changeTheme", SlideSet.prototype.changeTheme);
+exportProperty(SlideSet.prototype, "newSlide", SlideSet.prototype.newSlide);
 exportSymbol("DialogBox", DialogBox);
+exportProperty(DialogBox, "instance", DialogBox.instance);
+exportProperty(DialogBox.prototype, "show", DialogBox.prototype.show);
 exportSymbol("download", download);
