@@ -23,6 +23,8 @@ import os
 import random
 import string
 import sys
+import logging
+import re
 
 from google.appengine.api import users
 from google.appengine.ext import db
@@ -30,7 +32,9 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.ext.webapp.util import run_wsgi_app
+from google.appengine.api import urlfetch
 
+from django.utils import simplejson
 
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
@@ -39,6 +43,26 @@ _DEBUG = True
 # Add our custom Django template filters to the built in filters
 template.register_template_library('templatefilters')
 
+def remove_html_tags(data):
+  p = re.compile(r'<.*?>')
+  return p.sub('', data)
+
+def remove_divs(data):
+  p = re.compile(r'<[/]*div.*?>')
+  data = p.sub('', data)
+  # And spans..
+  # TODO: Replace the monospace spans with PRE tags.
+  # Maybe use BeautifulSoup
+  p = re.compile(r'<[/]*span.*?>')
+  data = p.sub('', data)
+  p = re.compile(r'<[/]*font.*?>')
+  data = p.sub('', data)
+  # And styles.. most styles don't matter
+  p = re.compile(r' style=".*?"')
+  data = p.sub('', data)
+  # And silly clear="none" on brs
+  data = data.replace(' clear="none"', '')
+  return data
 
 class SlideSet(db.Model):
   """A SlideSet is that encompasses all the slides.
@@ -51,7 +75,7 @@ class SlideSet(db.Model):
   updated = db.DateTimeProperty(auto_now=True)
   published = db.BooleanProperty(default=False)
   theme = db.StringProperty()
-  
+
   @staticmethod
   def get_current_user_sets():
     """Returns the slidesets that the current user has access to."""
@@ -93,13 +117,13 @@ class Slide(db.Model):
     Intro: Title, SubTitle, Section
     Section: Title, Section
     Default: Title, Content, Section
-   
+
   """
-  
+
   TYPE_INTRO = 'intro'
   TYPE_SECTION = 'section'
   TYPE_NORMAL = 'normal'
-  
+
   type = db.StringProperty(required=True)
   title = db.StringProperty()
   subtitle = db.StringProperty()
@@ -185,7 +209,7 @@ class SlideSetPage(BaseRequestHandler):
           self.error(403)
         return
 
-    slides = list(slide_set.slide_set.order('-index').order('created'))
+    slides = list(slide_set.slide_set.order('index').order('created'))
 
     self.response.headers['Content-Type'] = output_type[0]
     self.generate('slideset_%s.%s' % (output_name, output_type[1]), {
@@ -213,6 +237,65 @@ class CreateSlideSetAction(BaseRequestHandler):
     else:
       self.redirect('/list?id=' + str(slide_set.key()))
 
+class ImportSlideSetAction(BaseRequestHandler):
+  """ Imports a slideset from a Google presentation."""
+  def post(self):
+    user = users.get_current_user()
+    url = self.request.get('url', 'https://docs.google.com/present/view?id=dggjrx3s_3435z2tmzdg')
+    if not user or not url:
+      self.error(403)
+      return
+
+    # construct URL for embedded presentation
+    # URLs should have ?id = in them
+    doc_id = url.split('id=')[1]
+    embed_url = 'https://docs.google.com/present/embed?id=' + doc_id
+    # fetch HTML
+    result = urlfetch.fetch(embed_url)
+    if result.status_code == 200:
+      html = result.content
+      # parse to find the JSON
+      # need JSON fter initSlideshow
+      start = html.find('initSlideshow(') + 14
+      end = html.find('protocol') + 12
+      json = html[start:end]
+      doc_obj = simplejson.loads(json)
+      # create slide set
+      doc_title = doc_obj['attributes']['title']
+      slide_set = SlideSet(name=doc_title)
+      slide_set.put()
+      slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
+      slide_set_member.put()
+
+      slides = doc_obj['children']
+      for slide_id, slide_dict in slides.items():
+        logging.info(slide_id)
+        slide_layout = slide_dict['attributes']['layout']
+        # intro section normal
+        layout_types = {'LAYOUT_TITLE_SLIDE': 'intro',
+                        'LAYOUT_TITLE_BODY_SLIDE': 'normal'}
+        slide_type = layout_types.get(slide_layout, 'normal')
+        slide_index = slide_dict['index']
+        slide = Slide(type=slide_type, index=slide_index, slide_set=slide_set, title='',
+                      subtitle='', content='')
+        for slide_item_id, slide_item_dict in slide_dict['children'].items():
+          logging.info(slide_item_id)
+          logging.info(slide_item_dict)
+          if 'type' not in slide_item_dict['attributes']: 
+            continue
+          slide_item_type = slide_item_dict['attributes']['type']
+          slide_item_contents = slide_item_dict['attributes']['contents']
+          if slide_item_type == 'centeredTitle' or slide_item_type == 'title':
+            slide.title = remove_html_tags(slide_item_contents)
+          if slide_item_type == 'subtitle':
+            slide.subtitle = remove_html_tags(slide_item_contents)
+          if slide_item_type == 'body':
+            slide.content = remove_divs(slide_item_contents)
+          slide.put()
+
+      self.redirect('/list?id=' + str(slide_set.key()))
+    # add each slide
+    # redirect
 
 class EditSlideAction(BaseRequestHandler):
   """Edits a specific slide, changing its description.
@@ -232,7 +315,7 @@ class EditSlideAction(BaseRequestHandler):
     type = self.request.get('type')
     subtitle = self.request.get('subtitle')
     content = self.request.get('content')
-    
+
     # Get the existing slide that we are editing
     slide_key = self.request.get('slide')
     if slide_key:
@@ -316,8 +399,8 @@ class InboxAction(BaseRequestHandler):
       if not slide_set or not slide_set.current_user_has_access():
         self.error(403)
         return
-        
-        
+
+
       for member in slide_set.SlideSetmember_set:
         member.delete()
       for slide in slide_set.slide_set:
@@ -384,10 +467,10 @@ class PublishSlideSetAction(BaseRequestHandler):
 
     slide_set.published = bool(self.request.get('publish'))
     slide_set.put()
-    
+
 class ChangeThemeAction(BaseRequestHandler):
   """Publishes a given slide set, which makes it viewable by everybody."""
-  
+
   def post(self):
     slide_set = SlideSet.get(self.request.get('id'))
     if not slide_set or not slide_set.current_user_has_access():
@@ -404,6 +487,7 @@ def main():
       ('/list', SlideSetPage),
       ('/editslide.do', EditSlideAction),
       ('/createslideset.do', CreateSlideSetAction),
+      ('/importslideset.do', ImportSlideSetAction),
       ('/addmember.do', AddMemberAction),
       ('/inboxaction.do', InboxAction),
       ('/slideset.do', SlideSetAction),

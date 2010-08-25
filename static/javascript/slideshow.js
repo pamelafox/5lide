@@ -326,6 +326,7 @@
          this.prev();
        }
     },
+  };
 
   // Initialize
   var slideshow = new SlideShow(query('.slide'));

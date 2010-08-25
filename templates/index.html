@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block head %}
-  <script type="text/javascript">
-  //<![CDATA[
-
+  <script>
   function newSlideSet() {
+    showDialog('slidesetform_dialog');
     var form = document.getElementById("slidesetform");
-    var dialog = document.getElementById("slidesetform_dialog");
-    DialogBox.instance().show(dialog, function() {
-      form["name"].focus();
-    });
+    form["name"].focus();
+  }
+
+  function importSlideSet() {
+    showDialog('slidesetimport_dialog');
+    var form = document.getElementById("slidesetimport");
+    form["url"].focus();
   }
 
   function selectLists(all) {
@@ -32,8 +34,6 @@
       row.style.backgroundColor = "white";
     }
   }
-
-  //]]>
   </script>
 {% endblock %}
 
@@ -43,6 +43,7 @@
       <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
       <div class="menu">
         <span class="item"><a href="javascript:newSlideSet()">New Slide Set</a></span>
+        <span class="item"><a href="javascript:importSlideSet()">Import Slide Set</a></span>
       </div>
       <div class="buttons top">
         <div class="left corner"></div>
@@ -108,27 +109,28 @@
           </div>
           <div class="buttons">
             <span class="button"><input type="submit" name="action" value="Create Slide Set"/></span>
-            <span class="button"><input type="button" value="Cancel" onclick="DialogBox.instance().close()"/></span>
+            <span class="button"><input type="button" value="Cancel" onclick="hideDialog()"/></span>
           </div>
         </div>
       </form>
     </div>
   </div>
 
-{% endblock %}
+  <div id="slidesetimport_dialog" class="dialog" style="display: none">
+    <div class="title">Import Slide Set</div>
+    <div class="content">
+      <form action="/importslideset.do" method="post" id="slidesetimport">
+        <div class="form">
+          <input type="hidden" name="slide" value=""/>
+          <div class="field">
+            <div class="url">URL</div>
+            <div class="value"><input name="url" type="text" size="70"/></div>
+          </div>
+          <div class="buttons">
+            <span class="button"><input type="submit" name="action" value="Import"/></span>
+            <span class="button"><input type="button" value="Cancel" onclick="hideDialog()"/></span>
+          </div>
+        </div>
+      </form>
 
-{% block footer %}
-  {% if debug %}
-    <script src="/static/javascript/debug/browser.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/dialog.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/dom.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/drag.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/event.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/io.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/lang.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/offscreen.js" type="text/javascript"></script>
-    <script src="/static/javascript/debug/slideset.js" type="text/javascript"></script>
-  {% else %}
-    <script src="/static/javascript/slides.js" type="text/javascript"></script>
-  {% endif %}
 {% endblock %}

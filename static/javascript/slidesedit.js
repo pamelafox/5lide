@@ -6,12 +6,6 @@ goog.require('goog.fx.DragListDirection');
 goog.require('goog.events.Event');
 goog.require('goog.net.XhrIo');
 
-// Returns a function that calls the given method on the given instance.
-function callback(instance, method) {
-  return function() {
-    method.apply(instance, arguments);
-  };
-}
 
 // A single slide. We know how to draw ourselves in the DOM and support the
 // dragging/reordering operations on slides.
@@ -69,16 +63,16 @@ Slide.prototype.attachToDOM = function(container) {
   this.titleContainer_ = this.createElement_("input", titleCell);
   this.titleContainer_.style.position = "relative";
   this.titleContainer_.value = this.title_ || "";
-  goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, callback(this, this.onEditKeyPress_));
-  goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
+  goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.titleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
 
    // Make subtitle cell
   var subtitleCell = this.createElement_("td", tr, "subtitlecol");
   this.subtitleContainer_ = this.createElement_("input", subtitleCell);
   if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
-  goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, callback(this, this.onEditKeyPress_));
-  goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
+  goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.subtitleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
   this.subtitleContainer_.value = this.subtitle_ || "";
 
@@ -87,7 +81,7 @@ Slide.prototype.attachToDOM = function(container) {
   this.contentContainer_ = this.createElement_("textarea", contentCell);
   this.contentContainer_.style.width = "60%";
   if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
-  goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.contentContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
   this.contentContainer_.value = this.content_ || "";
 
@@ -137,16 +131,17 @@ Slide.prototype.save = function() {
     args.push("slide=" + encodeURIComponent(this.key_));
   }
   goog.net.XhrIo.send('/editslide.do',
-    callback(this, this.onSave_),
+    goog.bind(this.onSave_, this),
     'POST',
     args.join("&")
   );
 }
 
 // Called when the save slide AJAX request finishes.
-Slide.prototype.onSave_ = function(text, status) {
-  if (status >= 200 && status < 300) {
-    this.key_ = text;
+Slide.prototype.onSave_ = function(e) {
+  var xhrio = e.target;
+  if (xhrio.isSuccess()) {
+    this.key_ = xhrio.getResponseText();
   }
 }
 
@@ -182,16 +177,21 @@ SlideSet.prototype.attachToDOM = function(container) {
     var slideElement = slide.attachToDOM(element);
     slideElement.slide = slide;
   }
+  this.order_ = order;
+  this.makeDraggable_();
+};
 
-  // Make children of element draggable
-  var dlg = new goog.fx.DragListGroup();
-  dlg.addDragList(element, goog.fx.DragListDirection.DOWN);
+SlideSet.prototype.makeDraggable_ = function() {
   var me = this;
+  if (this.dlg_) this.dlg_.disposeInternal();
+
+  var dlg = new goog.fx.DragListGroup();
+  dlg.addDragList(this.element_, goog.fx.DragListDirection.DOWN);
   goog.events.listen(dlg, goog.fx.DragListGroup.EventType.DRAGEND, function() {
     me.savePositions_();
   });
   dlg.init();
-  this.order_ = order;
+  this.dlg_ = dlg;
 }
 
 // Serializes the order of all of the slides in this list to the server so
@@ -233,4 +233,5 @@ SlideSet.prototype.newSlide = function(type) {
   this.slides_.push(slide);
   var slideElement = slide.attachToDOM(this.element_);
   slideElement.slide = slide;
+  this.makeDraggable_();
 }
