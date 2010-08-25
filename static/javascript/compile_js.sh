@@ -2,11 +2,12 @@
 #
 # Copyright 2010 Google Inc.
 
-# Download the closure compiler from
-# http://closure-compiler.googlecode.com/files/compiler-latest.zip
-# Extract to this directory, and run this shell script.
-java -jar compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS \
---js debug/browser.js --js debug/dialog.js --js debug/dom.js \
---js debug/drag.js --js debug/event.js --js debug/io.js \
---js debug/lang.js --js debug/offscreen.js --js debug/slideset.js \
---externs debug/externs_slides.js --js_output_file slides.js
+# This script will re-generate the compiled Closure code.
+
+# Download the closure compiler and library from
+# http://closure-compiler.googlecode.com/
+# Modify this script as required depending where you download them to.
+# Update reqs.js according to what JS is currently needed.
+ ~/www/closure-library/closure/bin/calcdeps.py -i reqs.js \
+ -p  ~/www/closure-library/ -o compiled --compiler_jar \
+ ~/closure-compiler/compiler.jar > closure-all.js

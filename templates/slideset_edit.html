@@ -14,43 +14,57 @@
     <script src="/static/javascript/debug/offscreen.js" type="text/javascript"></script>
     <script src="/static/javascript/debug/slideset.js" type="text/javascript"></script>
   {% else %}
-    <script src="/static/javascript/slides.js" type="text/javascript"></script>
+    <script src="/static/javascript/closure-all.js" type="text/javascript"></script>
+    <script src="/static/javascript/slidesedit.js" type="text/javascript"></script>
   {% endif %}
+   <link rel="stylesheet" href="http://closure-library.googlecode.com/svn/trunk/closure/goog/css/dialog.css"> 
   {% if slide_set.published %}
     <link rel="alternate" type="application/atom+xml" title="{{ slide_set.name|escape }}" href="{{ request.path }}?id={{ slide_set.key|stringformat:"s"|urlencode }}&amp;output=atom"/>
   {% endif %}
   <script type="text/javascript">
-  //<![CDATA[
-  function closeDialog() {
-    DialogBox.instance().close();
+  goog.require('goog.ui.Dialog');
+  goog.require('goog.net.XhrIo');
+
+  var dialog;
+
+  function showDialog(div_id) {
+    if (!dialog) {
+      dialog = new goog.ui.Dialog();
+    }
+    var div = document.getElementById(div_id);
+    var title = div.getElementsByClassName('title')[0].innerHTML;
+    var content = div.getElementsByClassName('content')[0].innerHTML;
+    dialog.setTitle(title);
+    dialog.setContent(content);
+    dialog.setButtonSet(null);
+    dialog.setVisible(true);
+  }
+
+  function closeDialog(div_id) {
+    dialog.setVisible(false);
   }
 
   function newCollaborator() {
     var form = document.getElementById("memberform");
-    var dialog = document.getElementById("memberform_dialog");
-    DialogBox.instance().show(dialog, function() {
-      form["email"].focus();
-    });
+    showDialog('memberform_dialog');
+    form["email"].focus();
   }
 
   function changeTheme() {
-    var dialog = document.getElementById("theme_dialog");
-    DialogBox.instance().show(dialog);
+    showDialog('theme_dialog');
   }
 
   function publishSlideSet(button) {
     var publish = button.value == "Publish";
     if (publish) {
-      var dialog = document.getElementById("publishform_dialog");
-      DialogBox.instance().show(dialog);
+      showDialog('publishform_dialog');
     } else {
       doPublish(false);
     }
   }
 
   function newSlide() {
-    var dialog = document.getElementById("slidetype_dialog");
-    DialogBox.instance().show(dialog);
+    showDialog('slidetype_dialog');
   }
 
   function doPublish(publish) {
@@ -74,10 +88,11 @@
     if (publish) {
       body += "&publish=1";
     }
-    download("/publishslideset.do", function() {
+
+    goog.net.XhrIo.send('/publishslideset.do', function() {
       buttons[0].value = publish ? "Unpublish" : "Publish";
       if (publish) {
-        DialogBox.instance().close();
+        closeDialog();
         info.style.display = "";
       } else {
         info.style.display = "none";
@@ -85,10 +100,8 @@
       for (var i = 0; i < buttons.length; i++) {
         buttons[i].disabled = false;
       }
-    }, {
-      post: true,
-      body: body
-    });
+    },
+     'POST', body);
   }
 
   //]]>
@@ -289,7 +302,8 @@
   var k = "{{ slide_set.key }}";
   var slideSet = new SlideSet(k, Slide.parseList([
     {% for slide in slides %}
-      [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title}}", "{{slide.subtitle}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
+      [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title}}",
+      "{{slide.subtitle}}", "{{slide.content|addslashes|linebreaksbr}}" ] {% if not forloop.last %},{% endif %}
     {% endfor %}
   ]));
   slideSet.attachToDOM(document.getElementById("container"));

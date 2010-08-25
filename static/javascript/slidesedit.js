@@ -1,7 +1,17 @@
-// Copyright 2007 Google Inc.
-// All Rights Reserved
-//
-// Author: Bret Taylor
+goog.require('goog.dom');
+goog.require('goog.net');
+goog.require('goog.style');
+goog.require('goog.fx.DragListGroup');
+goog.require('goog.fx.DragListDirection');
+goog.require('goog.events.Event');
+goog.require('goog.net.XhrIo');
+
+// Returns a function that calls the given method on the given instance.
+function callback(instance, method) {
+  return function() {
+    method.apply(instance, arguments);
+  };
+}
 
 // A single slide. We know how to draw ourselves in the DOM and support the
 // dragging/reordering operations on slides.
@@ -59,17 +69,17 @@ Slide.prototype.attachToDOM = function(container) {
   this.titleContainer_ = this.createElement_("input", titleCell);
   this.titleContainer_.style.position = "relative";
   this.titleContainer_.value = this.title_ || "";
-  Event.addListener(this.titleContainer_, "keypress", callback(this, this.onEditKeyPress_));
-  Event.addListener(this.titleContainer_, "blur", callback(this, this.saveEdit_));
-  Event.addListener(this.titleContainer_, "mousedown", stopEvent);
+  goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, callback(this, this.onEditKeyPress_));
+  goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.titleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
 
    // Make subtitle cell
   var subtitleCell = this.createElement_("td", tr, "subtitlecol");
   this.subtitleContainer_ = this.createElement_("input", subtitleCell);
   if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
-  Event.addListener(this.subtitleContainer_, "keypress", callback(this, this.onEditKeyPress_));
-  Event.addListener(this.subtitleContainer_, "blur", callback(this, this.saveEdit_));
-  Event.addListener(this.subtitleContainer_, "mousedown", stopEvent);
+  goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, callback(this, this.onEditKeyPress_));
+  goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.subtitleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
   this.subtitleContainer_.value = this.subtitle_ || "";
 
   // Make content input
@@ -77,20 +87,13 @@ Slide.prototype.attachToDOM = function(container) {
   this.contentContainer_ = this.createElement_("textarea", contentCell);
   this.contentContainer_.style.width = "60%";
   if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
-  Event.addListener(this.contentContainer_, "blur", callback(this, this.saveEdit_));
-  Event.addListener(this.contentContainer_, "mousedown", stopEvent);
+  goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, callback(this, this.saveEdit_));
+  goog.events.listen(this.contentContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
   this.contentContainer_.value = this.content_ || "";
 
-
-  // Enable drag positioning of this slide
-  var dragger = new Dragger(element, true);
-  Event.addListener(dragger, "dragstart", callback(this, this.onDragStart_));
-  Event.addListener(dragger, "dragend", callback(this, this.onDragEnd_));
-  Event.addListener(dragger, "drag", callback(this, this.onDrag_));
-  Event.addListener(dragger, "click", callback(this, this.edit));
+  goog.style.setUnselectable(element, false);
 
   this.element_ = element;
-  enableSelection(this.element_);
   return element;
 }
 
@@ -98,10 +101,10 @@ Slide.prototype.attachToDOM = function(container) {
 // edit on Return, cancel the edit on escape.
 Slide.prototype.onEditKeyPress_ = function(e) {
   if (e.keyCode == 13) {
-    cancelEvent(e);
+    goog.events.Event.stopPropagation(e);
     this.saveEdit_();
   } else if (e.keyCode == 27) {
-    cancelEvent(e);
+    goog.events.Event.stopPropagation(e);
     this.cleanUpEdit_();
   }
 }
@@ -133,10 +136,11 @@ Slide.prototype.save = function() {
   if (this.key_) {
     args.push("slide=" + encodeURIComponent(this.key_));
   }
-  download("/editslide.do", callback(this, this.onSave_), {
-    post: true,
-    body: args.join("&")
-  });
+  goog.net.XhrIo.send('/editslide.do',
+    callback(this, this.onSave_),
+    'POST',
+    args.join("&")
+  );
 }
 
 // Called when the save slide AJAX request finishes.
@@ -144,71 +148,6 @@ Slide.prototype.onSave_ = function(text, status) {
   if (status >= 200 && status < 300) {
     this.key_ = text;
   }
-}
-
-// Let the user drag this slide up and down. We remove our element from the
-// DOM and replace it with a placeholder so the user can see where the
-// slide will snap into place when it is dropped.
-Slide.prototype.onDragStart_ = function() {
-  var placeholder = document.createElement("div");
-  placeholder.style.width = this.element_.offsetWidth + "px";
-  placeholder.style.height = this.element_.offsetHeight + "px";
-  this.element_.parentNode.insertBefore(placeholder, this.element_);
-  setOpacity(this.element_, 0.5);
-  this.placeholder_ = placeholder;
-}
-
-// Reposition our placeholder based on the current position of the slide
-// being dragged.
-Slide.prototype.onDrag_ = function() {
-  var container = this.element_.parentNode;
-  var top = this.element_.offsetTop;
-  var bottom = this.element_.offsetTop + this.element_.offsetHeight;
-
-  for (var sibling = container.firstChild; sibling != null;
-       sibling = sibling.nextSibling) {
-    if (sibling == this.element_ || sibling == this.placeholder_) continue;
-
-    var siblingTop = sibling.offsetTop;
-    var siblingBottom = sibling.offsetTop + sibling.offsetHeight;
-    var siblingMiddle = (siblingTop + siblingBottom) / 2;
-
-    if (siblingTop > bottom) continue;
-    if (siblingBottom < top) continue;
-
-    if (siblingTop < top && top < siblingMiddle) {
-      if (this.placeholder_.nextChild != sibling) {
-        container.removeChild(this.placeholder_);
-        container.insertBefore(this.placeholder_, sibling);
-        return;
-      }
-    }
-
-    if (bottom > siblingMiddle) {
-      if (sibling.nextChild != this.placeholder_) {
-        container.removeChild(this.placeholder_);
-        container.insertBefore(this.placeholder_, sibling.nextSibling);
-        return;
-      }
-    }
-  }
-}
-
-// Place our slide back into the slide list DOM and get rid of the placeholder.
-Slide.prototype.onDragEnd_ = function() {
-  if (!this.placeholder_) return;
-  var container = this.element_.parentNode;
-  container.removeChild(this.element_);
-  this.element_.style.position = "relative";
-  this.element_.style.width = "auto";
-  this.element_.style.height = "auto";
-  this.element_.style.left = "auto";
-  this.element_.style.top = "auto";
-  setOpacity(this.element_, 1);
-  container.insertBefore(this.element_, this.placeholder_);
-  container.removeChild(this.placeholder_);
-  this.placeholder_ = null;
-  Event.trigger(this, "positionchanged");
 }
 
 // Creates a DOM element with the given name, parent, and class name.
@@ -242,9 +181,16 @@ SlideSet.prototype.attachToDOM = function(container) {
     order.push(slide.key());
     var slideElement = slide.attachToDOM(element);
     slideElement.slide = slide;
-    Event.addListener(slide, "positionchanged",
-                      callback(this, this.savePositions_));
   }
+
+  // Make children of element draggable
+  var dlg = new goog.fx.DragListGroup();
+  dlg.addDragList(element, goog.fx.DragListDirection.DOWN);
+  var me = this;
+  goog.events.listen(dlg, goog.fx.DragListGroup.EventType.DRAGEND, function() {
+    me.savePositions_();
+  });
+  dlg.init();
   this.order_ = order;
 }
 
@@ -273,18 +219,12 @@ SlideSet.prototype.savePositions_ = function() {
 
   // Save the order to the server
   var body = "slides=" + encodeURIComponent(order.join(","));
-  download("/setslidepositions.do", null, {
-    post: true,
-    body: body
-  });
+  goog.net.XhrIo.send('/setslidepositions.do', null, 'POST', body);
 }
 
 SlideSet.prototype.changeTheme = function(theme) {
   var body = "theme=" + theme + "&id=" + this.key_;
-  download("/changetheme.do", null, {
-    post: true,
-    body: body
-  });
+  goog.net.XhrIo.send('/changetheme.do', null, 'POST', body);
 }
 
 // Creates a new slide in this list
@@ -293,28 +233,4 @@ SlideSet.prototype.newSlide = function(type) {
   this.slides_.push(slide);
   var slideElement = slide.attachToDOM(this.element_);
   slideElement.slide = slide;
-  Event.addListener(slide, "positionchanged",
-                    callback(this, this.savePositions_));
 }
-
-// Mimics goog.exportSymbol and goog.exportProperty from base.js
-function exportSymbol(name, symbol) {
-  window[name] = symbol;
-}
-
-function exportProperty(object, publicName, symbol) {
-  object[publicName] = symbol;
-}
-
-exportSymbol("Slide", Slide);
-exportProperty(Slide, "parseList", Slide.parseList);
-exportProperty(Slide, "attachToDOM", Slide.attachToDOM);
-exportProperty(Slide, "save", Slide.save);
-exportSymbol("SlideSet", SlideSet);
-exportProperty(SlideSet.prototype, "attachToDOM", SlideSet.prototype.attachToDOM);
-exportProperty(SlideSet.prototype, "changeTheme", SlideSet.prototype.changeTheme);
-exportProperty(SlideSet.prototype, "newSlide", SlideSet.prototype.newSlide);
-exportSymbol("DialogBox", DialogBox);
-exportProperty(DialogBox, "instance", DialogBox.instance);
-exportProperty(DialogBox.prototype, "show", DialogBox.prototype.show);
-exportSymbol("download", download);
