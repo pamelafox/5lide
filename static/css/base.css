@@ -147,6 +147,7 @@ a.button:hover, input[type^="submit"]:hover, input[type^="button"]:hover {
   background-color: #c3d9ff;
   padding: 7px;
   position: relative;
+  clear: both;
 }
 
 .slidesarea .buttons .info {

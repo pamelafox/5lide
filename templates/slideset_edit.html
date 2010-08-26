@@ -81,6 +81,7 @@
 
   .collaborators {
     float: right;
+    padding-bottom: 2px;
   }
 
   .collaborators .button {
@@ -90,10 +91,6 @@
   .slidesarea {
     clear: both;
     margin-top: 0.5em;
-  }
-
-  .slidesarea .top {
-    margin-bottom: 5px;
   }
 
   .slidesarea .slide table td {
@@ -145,26 +142,21 @@
 {% endblock %}
 
 {% block body %}
-  <div class="collaborators">
-    <table><tr><td>
-      <span class="label">Collaborators:</span>
-      {% for member in slide_set.slidesetmember_set %}
-        {% ifequal member.user.email user.email %}
-          Me
-        {% else %}
-          {{ member.user.nickname }}
-        {% endifequal %}
-        {% if not forloop.last %}/{% endif %}
-      {% endfor %}
-    </td><td class="button">
-      <input type="button" value="New" onclick="newCollaborator()"/>
-    </td></tr></table>
-  </div>
 
   <h1>{{ slide_set.name|escape }}</h1>
 
   <form action="/slideset.do" method="post">
     <div class="slidesarea">
+     <div class="collaborators">
+      <span class="label">Collaborators:</span>
+       {% for member in slide_set.slidesetmember_set %}{% ifequal member.user.email user.email %}Me{% else %}{{ member.user.nickname }}{% endifequal %}{% if not forloop.last %}/{% endif %}{% endfor %}
+      <input type="button" value="New" onclick="newCollaborator()"/>
+     </div>
+     <div class="menu">
+      <input type="button" value="Change Theme" onclick="changeTheme(this)">
+      <input id="publish_button" type="button" value="{% if slide_set.published %}Unpublish{% else %}Publish{% endif %}"
+        onclick="publishSlideSet(this)">
+     </div>
       <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
       <div class="buttons top">
         <div class="left corner"></div>
@@ -174,23 +166,27 @@
           |
           <span class="button"><a href="{{ request.uri|escape }}&amp;output=slide">View as Slideshow</a></span>
         </div>
-        <span class="button"><input id="theme_button" type="button" value="Change Theme" onclick="changeTheme(this)"/></span>
-        <span class="button"><input id="publish_button" type="button" value="{% if slide_set.published %}Unpublish{% else %}Publish{% endif %}" onclick="publishSlideSet(this)"/></span>
-        <span id="publish_info" style="margin-left: 0.5em;{% if not slide_set.published %}display: none{% endif %}">
+        <span class="button"><input id="delete_button" name="action"
+          type="submit"
+          value="Delete" onclick="return confirm('Are you sure you want to permanently delete the selected slides?')"/></span>
       </div>
       <div class="table">
         <div id="container">
         <table>
         <tr>
-        <td class="typecol">type</td>
-        <td class="titlecol">title</td>
-        <td class="subtitlecol">subtitle</td>
-        <td class="contentcol">content</td></tr>
+        <th class="checkbox"></th>
+        <th class="typecol">Type</th>
+        <th class="titlecol">Title</th>
+        <th class="subtitlecol">Subtitle</th>
+        <th class="contentcol">Content</th>
+        </tr>
         </table>
         </div>
         <div class="newslideset" style="cursor: pointer" onclick="newSlide()"><img src="/static/images/zip-plus.gif" style="width: 14px; height: 14px"> <span class="text">New slide</span></div>
         {% if slides %}
-          <div class="message">Drag slides up and down to rearrange them.</div>
+        <div class="message">
+          To re-order slides, drag the slide icons up or down.
+        </div>
         {% endif %}
       </div>
     </div>

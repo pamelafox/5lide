@@ -48,42 +48,50 @@ Slide.parseList = function(list) {
 // Attaches this slide to the given element container, creating the DOM
 // elements representing this slide.
 Slide.prototype.attachToDOM = function(container) {
-  var element = this.createElement_("div", container, "slide");
-  element.style.position = "relative";
+  var element = this.createElement_('div', container, 'slide');
+  element.style.position = 'relative';
 
-  var table = this.createElement_("table", element);
-  var tbody = this.createElement_("tbody", table);
-  var tr = this.createElement_("tr", tbody);
+  var table = this.createElement_('table', element);
+  var tbody = this.createElement_('tbody', table);
+  var tr = this.createElement_('tr', tbody);
 
-  var typeCell = this.createElement_("td", tr, "typecol");
-  var typeImg = this.createElement_("img", typeCell);
-  typeImg.src = "/static/images/type_" + this.type_ + ".png";
+  var checkCell = this.createElement_('td', tr, 'checkbox');
+  var checkbox = this.createElement_('input', checkCell);
+  checkbox.type = 'checkbox';
+  checkbox.value = this.key_;
+  checkbox.name = 'slide';
 
-  var titleCell = this.createElement_("td", tr, "titlecol");
-  this.titleContainer_ = this.createElement_("input", titleCell);
-  this.titleContainer_.style.position = "relative";
-  this.titleContainer_.value = this.title_ || "";
+  var typeCell = this.createElement_('td', tr, 'typecol');
+  var typeImg = this.createElement_('img', typeCell);
+  typeImg.style.cursor = 'move';
+  typeImg.alt = 'Drag to reorder slides';
+  typeImg.src = '/static/images/type_' + this.type_ + '.png';
+
+  var titleCell = this.createElement_('td', tr, 'titlecol');
+  this.titleContainer_ = this.createElement_('input', titleCell);
+  this.titleContainer_.style.position = 'relative';
+  this.titleContainer_.value = this.title_ || '';
   goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
   goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.titleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
 
    // Make subtitle cell
-  var subtitleCell = this.createElement_("td", tr, "subtitlecol");
-  this.subtitleContainer_ = this.createElement_("input", subtitleCell);
+  var subtitleCell = this.createElement_('td', tr, 'subtitlecol');
+  this.subtitleContainer_ = this.createElement_('input', subtitleCell);
   if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
   goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
   goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.subtitleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
-  this.subtitleContainer_.value = this.subtitle_ || "";
+  this.subtitleContainer_.value = this.subtitle_ || '';
 
   // Make content input
-  var contentCell = this.createElement_("td", tr, "contentcol");
-  this.contentContainer_ = this.createElement_("textarea", contentCell);
-  this.contentContainer_.style.width = "60%";
+  var contentCell = this.createElement_('td', tr, 'contentcol');
+  this.contentContainer_ = this.createElement_('textarea', contentCell);
+  this.contentContainer_.style.width = '60%';
   if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
   goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
   goog.events.listen(this.contentContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
-  this.contentContainer_.value = this.content_ || "";
+  this.contentContainer_.value = this.content_ || '';
 
   goog.style.setUnselectable(element, false);
 
@@ -120,20 +128,30 @@ Slide.prototype.saveEdit_ = function() {
 
 // Saves this slide to the datastore on the server with an AJAX request.
 Slide.prototype.save = function() {
+  // Find index by figuring out which element it is beneath its parent
+  var parentNode = this.element_.parentNode;
+  for (var child = parentNode.firstChild, i = 0; child != null; child = child.nextSibling, i++) {
+    if (child.slide && child == this.element_) {
+      // Index is 1-based
+      index = i + 1;
+    }
+  }
+
   var args = [
-      "set=" + encodeURIComponent(this.setKey_),
-      "type=" + encodeURIComponent(this.type_),
-      "title=" + encodeURIComponent(this.title_),
-      "subtitle=" + encodeURIComponent(this.subtitle_),
-      "content=" + encodeURIComponent(this.content_)
+      'set=' + encodeURIComponent(this.setKey_),
+      'type=' + encodeURIComponent(this.type_),
+      'title=' + encodeURIComponent(this.title_),
+      'subtitle=' + encodeURIComponent(this.subtitle_),
+      'content=' + encodeURIComponent(this.content_),
+      'index=' + index
   ];
   if (this.key_) {
-    args.push("slide=" + encodeURIComponent(this.key_));
+    args.push('slide=' + encodeURIComponent(this.key_));
   }
   goog.net.XhrIo.send('/editslide.do',
     goog.bind(this.onSave_, this),
     'POST',
-    args.join("&")
+    args.join('&')
   );
 }
 
@@ -165,9 +183,9 @@ function SlideSet(key, slides) {
 
 // Draws this slide list in the given container.
 SlideSet.prototype.attachToDOM = function(container) {
-  var element = document.createElement("div");
-  element.className = "slidelist";
-  element.style.position = "relative";
+  var element = document.createElement('div');
+  element.className = 'slidelist';
+  element.style.position = 'relative';
   container.appendChild(element);
   this.element_ = element;
   var order = [];
@@ -187,9 +205,12 @@ SlideSet.prototype.makeDraggable_ = function() {
 
   var dlg = new goog.fx.DragListGroup();
   dlg.addDragList(this.element_, goog.fx.DragListDirection.DOWN);
+  dlg.setFunctionToGetHandleForDragItem(function(dragItem) {
+    return dragItem.getElementsByTagName('img')[0]; });
   goog.events.listen(dlg, goog.fx.DragListGroup.EventType.DRAGEND, function() {
     me.savePositions_();
   });
+
   dlg.init();
   this.dlg_ = dlg;
 }
@@ -199,8 +220,7 @@ SlideSet.prototype.makeDraggable_ = function() {
 SlideSet.prototype.savePositions_ = function() {
   // Determine the slide order based on the positions of the DIVs
   var order = [];
-  for (var child = this.element_.firstChild; child != null;
-       child = child.nextSibling) {
+  for (var child = this.element_.firstChild; child != null; child = child.nextSibling) {
     if (child.slide) {
       order.push(child.slide.key());
     }
@@ -218,18 +238,18 @@ SlideSet.prototype.savePositions_ = function() {
   this.order_ = order;
 
   // Save the order to the server
-  var body = "slides=" + encodeURIComponent(order.join(","));
+  var body = 'slides=' + encodeURIComponent(order.join(','));
   goog.net.XhrIo.send('/setslidepositions.do', null, 'POST', body);
 }
 
 SlideSet.prototype.changeTheme = function(theme) {
-  var body = "theme=" + theme + "&id=" + this.key_;
+  var body = 'theme=' + theme + '&id=' + this.key_;
   goog.net.XhrIo.send('/changetheme.do', null, 'POST', body);
 }
 
 // Creates a new slide in this list
 SlideSet.prototype.newSlide = function(type) {
-  var slide = new Slide(this.key_, null, type, "", "", "");
+  var slide = new Slide(this.key_, null, type, '', '', '');
   this.slides_.push(slide);
   var slideElement = slide.attachToDOM(this.element_);
   slideElement.slide = slide;

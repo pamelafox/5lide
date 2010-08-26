@@ -24,3 +24,16 @@ indexes:
   - name: index
     direction: desc
   - name: created
+
+- kind: Slide
+  properties:
+  - name: slide_set
+  - name: index
+  - name: created
+
+- kind: Slide
+  properties:
+  - name: slide_set
+  - name: index
+  - name: created
+    direction: desc

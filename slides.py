@@ -209,7 +209,7 @@ class SlideSetPage(BaseRequestHandler):
           self.error(403)
         return
 
-    slides = list(slide_set.slide_set.order('index').order('created'))
+    slides = list(slide_set.slide_set.order('index'))
 
     self.response.headers['Content-Type'] = output_type[0]
     self.generate('slideset_%s.%s' % (output_name, output_type[1]), {
@@ -315,6 +315,7 @@ class EditSlideAction(BaseRequestHandler):
     type = self.request.get('type')
     subtitle = self.request.get('subtitle')
     content = self.request.get('content')
+    index = int(self.request.get('index'))
 
     # Get the existing slide that we are editing
     slide_key = self.request.get('slide')
@@ -401,7 +402,7 @@ class InboxAction(BaseRequestHandler):
         return
 
 
-      for member in slide_set.SlideSetmember_set:
+      for member in slide_set.slidesetmember_set:
         member.delete()
       for slide in slide_set.slide_set:
         slide.delete()
@@ -438,8 +439,8 @@ class SetSlidePositionsAction(BaseRequestHandler):
   """Orders the slides in a slide sets.
 
   The input to this handler is a comma-separated list of slide keys in the
-  "slides" argument to the post. We assign priorities to the given slides
-  based on that order (e.g., 1 through N for N slides).
+  "slides" argument to the post. We assign index to slides based on that order
+  (e.g., 1 through N for N slides).
   """
   def post(self):
     keys = self.request.get('slides').split(',')
@@ -453,7 +454,8 @@ class SetSlidePositionsAction(BaseRequestHandler):
       if not slide or not slide.slide_set.current_user_has_access():
         self.error(403)
         return
-      slide.index = num_keys - i - 1
+      # Index is 1-based
+      slide.index = (i + 1)
       slide.put()
 
 
