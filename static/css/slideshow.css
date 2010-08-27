@@ -87,6 +87,8 @@ body {
 .slide img {
   max-height: 90%;
   border: 1px solid white;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  text-align: center;
 }
 
 .slide:nth-child(even) {
@@ -218,7 +220,7 @@ pre {
   -khtml-border-radius: 8px;
   -moz-border-radius: 8px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 0, 0, 0.2);
+  bord3r: 1px solid rgba(255, 0, 0, 0.2);
 }
 
 pre b {

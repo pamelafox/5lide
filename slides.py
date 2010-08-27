@@ -209,7 +209,9 @@ class SlideSetPage(BaseRequestHandler):
           self.error(403)
         return
 
-    slides = list(slide_set.slide_set.order('index'))
+    slides = list(slide_set.slide_set.order('index').order('created'))
+    for slide in slides:
+      slide.content = slide.content.replace('\n', 'NEWLINE')
 
     self.response.headers['Content-Type'] = output_type[0]
     self.generate('slideset_%s.%s' % (output_name, output_type[1]), {
@@ -235,7 +237,7 @@ class CreateSlideSetAction(BaseRequestHandler):
     if self.request.get('next'):
       self.redirect(self.request.get('next'))
     else:
-      self.redirect('/list?id=' + str(slide_set.key()))
+      self.redirect('/set?id=' + str(slide_set.key()))
 
 class ImportSlideSetAction(BaseRequestHandler):
   """ Imports a slideset from a Google presentation."""
@@ -487,6 +489,7 @@ def main():
   application = webapp.WSGIApplication([
       ('/', InboxPage),
       ('/list', SlideSetPage),
+      ('/set', SlideSetPage),
       ('/editslide.do', EditSlideAction),
       ('/createslideset.do', CreateSlideSetAction),
       ('/importslideset.do', ImportSlideSetAction),

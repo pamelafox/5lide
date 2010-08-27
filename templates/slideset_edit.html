@@ -263,7 +263,7 @@
   var slideSet = new SlideSet(k, Slide.parseList([
     {% for slide in slides %}
       [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title}}",
-      "{{slide.subtitle}}", "{{slide.content|addslashes|linebreaksbr}}" ] {% if not forloop.last %},{% endif %}
+      "{{slide.subtitle}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
     {% endfor %}
   ]));
   slideSet.attachToDOM(document.getElementById("container"));

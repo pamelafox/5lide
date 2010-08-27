@@ -15,7 +15,7 @@ function Slide(setKey, key, type, title, subtitle, content) {
   this.type_ = type; 
   this.title_ = title;
   this.subtitle_ = subtitle || '';
-  this.content_ = content || '';
+  this.content_ = content.replace(/NEWLINE/g, '\n') || '';
 }
 
 Slide.TYPE_INTRO = 'intro';

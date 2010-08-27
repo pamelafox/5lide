@@ -37,3 +37,8 @@ indexes:
   - name: index
   - name: created
     direction: desc
+
+- kind: Slide
+  properties:
+  - name: slide_set
+  - name: index
