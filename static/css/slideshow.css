@@ -76,6 +76,18 @@ body {
   font-size: 140%;
 }
 
+.content input, button {
+  font-size: 140%;
+}
+
+.content td {
+   border: 1px solid black;
+}
+
+.invalid {
+  background-color: red;
+}
+
 .slide.section {
   text-align: center;
 }
@@ -84,10 +96,16 @@ body {
   margin-top: 200px;
 }
 
+.slide li {
+  margin-bottom: 10px;
+}
+
 .slide img {
   max-height: 90%;
   border: 1px solid white;
   box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.1) 0 2px 5px;
   text-align: center;
 }
 

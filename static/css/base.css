@@ -6,21 +6,11 @@ body {
   margin: 10px;
 }
 
-body, input, textarea {
+body, input, textarea, table, td {
   font-family: Arial, sans-serif;
   font-size: small;
 }
 
-table {
-  border-collapse: collapse;
-}
-
-td {
-  padding: 0;
-  border: 0;
-  text-align: left;
-  vertical-align: middle;
-}
 
 form {
   margin: 0;

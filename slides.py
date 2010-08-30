@@ -209,9 +209,12 @@ class SlideSetPage(BaseRequestHandler):
           self.error(403)
         return
 
-    slides = list(slide_set.slide_set.order('index').order('created'))
-    for slide in slides:
-      slide.content = slide.content.replace('\n', 'NEWLINE')
+    slides = list(slide_set.slide_set.order('index'))
+
+    # Workaround for newlines in JS output
+    if output_name == 'edit':
+      for slide in slides:
+        slide.content = slide.content.replace('\n', 'NEWLINE')
 
     self.response.headers['Content-Type'] = output_type[0]
     self.generate('slideset_%s.%s' % (output_name, output_type[1]), {
@@ -341,8 +344,10 @@ class EditSlideAction(BaseRequestHandler):
       slide.title = title
       slide.subtitle = subtitle
       slide.content = content
+      slide.index = index
     else:
-      slide = Slide(type=type, title=title, slide_set=slide_set, content=content, subtitle=subtitle)
+      slide = Slide(type=type, title=title, slide_set=slide_set,
+                    content=content, index=index, subtitle=subtitle)
     slide.put()
 
     # Update the slide set so it's updated date is updated. Saving it is all
