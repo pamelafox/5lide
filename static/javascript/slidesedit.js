@@ -60,6 +60,7 @@ Slide.prototype.attachToDOM = function(container) {
   checkbox.type = 'checkbox';
   checkbox.value = this.key_;
   checkbox.name = 'slide';
+  this.checkbox = checkbox;
 
   var typeCell = this.createElement_('td', tr, 'typecol');
   var typeImg = this.createElement_('img', typeCell);
@@ -160,6 +161,7 @@ Slide.prototype.onSave_ = function(e) {
   var xhrio = e.target;
   if (xhrio.isSuccess()) {
     this.key_ = xhrio.getResponseText();
+    this.checkbox.value = this.key_;
   }
 }
 
