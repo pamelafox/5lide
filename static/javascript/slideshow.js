@@ -225,7 +225,7 @@
         function(e) { _t.handleTouchStart(e); }, false);
     doc.addEventListener('touchend', 
         function(e) { _t.handleTouchEnd(e); }, false);
-    window.addEventListener('popstate', 
+    window.addEventListener('popstate',
         function(e) { _t.go(e.state); }, false);
     this._update();
   };
@@ -260,6 +260,7 @@
       this._update();
     },
     go: function(num) {
+      if (!num) return;
       if (history.pushState && this.current != num) {
         history.replaceState(this.current, 'Slide ' + this.current, '#slide' + this.current);
       }

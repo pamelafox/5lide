@@ -262,8 +262,8 @@
   var k = "{{ slide_set.key }}";
   var slideSet = new SlideSet(k, Slide.parseList([
     {% for slide in slides %}
-      [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title}}",
-      "{{slide.subtitle}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
+      [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title|addslashes}}",
+      "{{slide.subtitle|addslashes}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
     {% endfor %}
   ]));
   slideSet.attachToDOM(document.getElementById("container"));
