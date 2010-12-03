@@ -36,6 +36,8 @@ from google.appengine.api import urlfetch
 
 from django.utils import simplejson
 
+import pdfcrowd
+
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
 
@@ -143,19 +145,21 @@ class BaseRequestHandler(webapp.RequestHandler):
   in the 'request' variable.
   """
   def generate(self, template_name, template_values={}):
+    self.response.out.write(self.get_html(template_name, template_values))
+    
+  def get_html(self, template_name, template_values={}):
     values = {
         'request': self.request,
         'user': users.get_current_user(),
         'login_url': users.create_login_url(self.request.uri),
         'logout_url': users.create_logout_url('http://%s/' % (
             self.request.host,)),
-        'debug': False,
-        'application_name': 'Task Manager',}
+        'debug': False,}
     values.update(template_values)
     directory = os.path.dirname(__file__)
-    path = os.path.join(directory, os.path.join('templates', template_name))
-    self.response.out.write(template.render(path, values, debug=_DEBUG))
-
+    path = os.path.join(directory, os.path.join('templates', template_name)) 
+    return template.render(path, values, debug=_DEBUG)
+    
 
 class InboxPage(BaseRequestHandler):
   """Lists all the slide sets for the current user."""
@@ -178,9 +182,10 @@ class SlideSetPage(BaseRequestHandler):
   # The different slide set output types we support: content types and
   # template file extensions
   _OUTPUT_TYPES = {
-    'edit': ['text/html', 'html'],
-    'slide': ['text/html', 'html'],
-    'atom': ['application/atom+xml', 'xml'],}
+    'pdf': ['application/pdf', 'slide', 'html'],
+    'edit': ['text/html', 'edit', 'html'],
+    'slide': ['text/html', 'slide', 'html'],
+    'atom': ['application/atom+xml', 'atom', 'xml'],}
 
   def get(self):
     slide_set = SlideSet.get(self.request.get('id'))
@@ -215,12 +220,23 @@ class SlideSetPage(BaseRequestHandler):
     if output_name == 'edit':
       for slide in slides:
         slide.content = slide.content.replace('\n', 'NEWLINE')
-
-    self.response.headers['Content-Type'] = output_type[0]
-    self.generate('slideset_%s.%s' % (output_name, output_type[1]), {
+    
+    template_name = 'slideset_%s.%s' % (output_type[1], output_type[2])
+    template_values = {
         'slide_set': slide_set,
-        'slides': slides
-        })
+        'slides': slides,
+        'printable': self.request.get('printable')
+        }
+        
+    ### PDF
+    if output_name == 'pdf':
+      client = pdfcrowd.Client('pamelafox', '77e03da88d43c882d4572df175cbbf27')
+      client.usePrintMedia(True)
+      pdf = client.convertHtml(self.get_html(template_name, template_values), self.response.out)
+      
+      
+    self.response.headers['Content-Type'] = output_type[0]
+    self.generate(template_name, template_values)
 
 
 class CreateSlideSetAction(BaseRequestHandler):

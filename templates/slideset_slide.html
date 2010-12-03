@@ -9,24 +9,44 @@
     <meta charset="utf-8" />
     <title>{{slide_set.name}}</title>
     <link href="http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono|Tangerine" rel="stylesheet" type="text/css" />
-    <link href="/static/css/slideshow.css" rel="stylesheet" type="text/css" />
-    <link href="/static/css/theme_{{ slide_set.theme }}.css" rel="stylesheet" type="text/css" />
+    <link href="/static/css/slideshow.css" rel="stylesheet" type="text/css" media="projection, screen"/>
+    {% if slide_set.theme %}
+    <link href="/static/css/theme_{{ slide_set.theme }}.css" rel="stylesheet" type="text/css"  media="projection, screen"/>
+    {% endif %}
+     <style type="text/css" media="print">
+.slide {
+  page-break-inside: avoid;
+  page-break-after: always;
+  visibility: visible !important;
+  font-size: 20pt;
+  font-family: Arial, sans-serif;
+}
+
+@page {
+  size: landscape;
+}
+
+body {font-size: 12pt; background: white;}
+* {color: black;}
+
+header h1 {border-top: 2pt solid gray; border-bottom: 1px dotted silver;}
+
+#presentation-counter, .info, .counter {display: none}
+    </style>
     {% ifequal slide_set.theme "party" %}
-    <link href="/static/css/confetti.css" rel="stylesheet" type="text/css"/>
-    <script src="/static/javascript/confetti.js"></script>
+      <link href="/static/css/confetti.css" rel="stylesheet" type="text/css" media="projection, screen"/>
+      <script src="/static/javascript/confetti.js"></script>
     {% endifequal %}
   </head> 
   <body> 
+  
+  <div class="info">
+    <p>Press <span class="key">&rarr;</span> key to advance. Zoom in/out: <span class="key">Ctrl or Command</span> + <span class="key">+/-</span>. <a href="/set?id={{ slide_set.key }}&output=pdf">Download PDF</a> </p>
+  </div>
+  
   <div class="presentation">
       <div id="presentation-counter"></div>
       <div class="slides">
-        <div class="slide">
-          <section>
-            <p>This presentation is an HTML5 website</p>
-            <p>Press <span class="key">&rarr;</span> key to advance.</p>
-            <p>Zoom in/out: <span class="key">Ctrl or Command</span> + <span class="key">+/-</span></p>
-          </section>
-        </div>
 
     {% for slide in slides %}
       {% ifequal slide.type 'intro' %}

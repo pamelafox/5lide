@@ -10,20 +10,10 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Unused in query history -- copied from input.
 - kind: Slide
   properties:
   - name: slide_set
   - name: index
-    direction: desc
-
-# Used 6 times in query history.
-- kind: Slide
-  properties:
-  - name: slide_set
-  - name: index
-    direction: desc
-  - name: created
 
 - kind: Slide
   properties:
@@ -42,3 +32,11 @@ indexes:
   properties:
   - name: slide_set
   - name: index
+    direction: desc
+
+- kind: Slide
+  properties:
+  - name: slide_set
+  - name: index
+    direction: desc
+  - name: created
