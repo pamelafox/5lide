@@ -200,7 +200,7 @@ class SlideSetPage(BaseRequestHandler):
     output_type = SlideSetPage._OUTPUT_TYPES[output_name]
 
     # Validate this user has access to this slide set. If not, they can
-    # access the html view of this list only if it is published.
+    # access the html view of this set only if it is published.
     if not slide_set.current_user_has_access():
       if slide_set.published:
         if output_name == 'edit':
@@ -314,7 +314,7 @@ class ImportSlideSetAction(BaseRequestHandler):
             slide.content = remove_divs(slide_item_contents)
           slide.put()
 
-      self.redirect('/list?id=' + str(slide_set.key()))
+      self.redirect('/set?id=' + str(slide_set.key()))
     # add each slide
     # redirect
 
@@ -382,7 +382,7 @@ class EditSlideAction(BaseRequestHandler):
 class AddMemberAction(BaseRequestHandler):
   """Adds a new User to a SlideSet ACL."""
   def post(self):
-    slide_set = SlideSet.get(self.request.get('list'))
+    slide_set = SlideSet.get(self.request.get('set'))
     email = self.request.get('email')
     if not slide_set or not email:
       self.error(403)
@@ -411,12 +411,12 @@ class InboxAction(BaseRequestHandler):
   """
   def post(self):
     action = self.request.get('action')
-    lists = self.request.get('list', allow_multiple=True)
+    sets = self.request.get('set', allow_multiple=True)
     if not action in ['Delete']:
       self.error(403)
       return
 
-    for key in lists:
+    for key in sets:
       slide_set = SlideSet.get(key)
 
       # Validate this user has access to this slide set

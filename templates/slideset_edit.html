@@ -198,7 +198,7 @@
       <form action="/addmember.do" method="post" id="memberform">
         <div class="form">
           <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
-          <input type="hidden" name="list" value="{{ slide_set.key }}"/>
+          <input type="hidden" name="set" value="{{ slide_set.key }}"/>
           <div class="field">
             <div class="name">Username</div>
             <div class="value"><input name="email" type="text" size="10"/></div>
