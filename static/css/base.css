@@ -3,7 +3,6 @@
 body {
   background-color: white;
   color: black;
-  margin: 10px;
 }
 
 body, input, textarea, table, td {
@@ -30,7 +29,7 @@ a:visited {
 }
 
 #header {
-  position: relative;
+  margin-top: 5px;
 }
 
 #header .title {
@@ -57,12 +56,6 @@ a:visited {
   width: 241px;
   height: 26px;
   border: 0;
-}
-
-#header .login {
-  position: absolute;
-  top: 0px;
-  right: 0px;
 }
 
 #header .login .nickname {

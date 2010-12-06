@@ -36,7 +36,8 @@
   <body {% block bodyattributes %}{% endblock %}>
     {% block header %}
       <div id="header">
-        <div class="login">
+        <div class="title" style="float:left; width: 300px;"><a href="/">5lide</a></div>
+        <div class="login" style="float:right">
           {% if user %}
             <span class="item nickname">{{ user.nickname }}</span> |
           {% endif %}
@@ -51,7 +52,7 @@
             <span class="item"><a href="{{ login_url|escape }}">Sign in</a></span>
           {% endif %}
         </div>
-        <div class="title"><a href="/"><h1>5lide</h1></a></div>
+        
       </div>
     {% endblock %}
     <div id="body">{% block body %}{% endblock %}</div>

@@ -51,51 +51,42 @@ Slide.prototype.attachToDOM = function(container) {
   var element = this.createElement_('div', container, 'slide');
   element.style.position = 'relative';
 
-  var table = this.createElement_('table', element);
-  var tbody = this.createElement_('tbody', table);
-  var tr = this.createElement_('tr', tbody);
-
-  var checkCell = this.createElement_('td', tr, 'checkbox');
-  var checkbox = this.createElement_('input', checkCell);
-  checkbox.type = 'checkbox';
-  checkbox.value = this.key_;
-  checkbox.name = 'slide';
-  this.checkbox = checkbox;
-
-  var typeCell = this.createElement_('td', tr, 'typecol');
-  var typeImg = this.createElement_('img', typeCell);
+  var typeImg = this.createElement_('img', element);
   typeImg.style.cursor = 'move';
   typeImg.alt = 'Drag to reorder slides';
   typeImg.src = '/static/images/type_' + this.type_ + '.png';
 
-  var titleCell = this.createElement_('td', tr, 'titlecol');
-  this.titleContainer_ = this.createElement_('input', titleCell);
-  this.titleContainer_.style.position = 'relative';
-  this.titleContainer_.value = this.title_ || '';
-  goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
-  goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
-  goog.events.listen(this.titleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
+  goog.events.listen(typeImg, goog.events.EventType.CLICK, function() {
+    /*
+    var centerArea = document.getElementById('centertable');
+    
+    this.titleContainer_ = this.createElement_('input', centerArea);
+    this.titleContainer_.style.position = 'relative';
+    this.titleContainer_.value = this.title_ || '';
+    goog.events.listen(this.titleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
+    goog.events.listen(this.titleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
+    goog.events.listen(this.titleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
 
-   // Make subtitle cell
-  var subtitleCell = this.createElement_('td', tr, 'subtitlecol');
-  this.subtitleContainer_ = this.createElement_('input', subtitleCell);
-  if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
-  goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
-  goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
-  goog.events.listen(this.subtitleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
-  this.subtitleContainer_.value = this.subtitle_ || '';
+     // Make subtitle cell
+    this.subtitleContainer_ = this.createElement_('input', centerArea);
+    if (this.type_ != Slide.TYPE_INTRO) this.subtitleContainer_.disabled = true;
+    goog.events.listen(this.subtitleContainer_, goog.events.EventType.KEYPRESS, goog.bind(this.onEditKeyPress_, this));
+    goog.events.listen(this.subtitleContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
+    goog.events.listen(this.subtitleContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
+    this.subtitleContainer_.value = this.subtitle_ || '';
 
-  // Make content input
-  var contentCell = this.createElement_('td', tr, 'contentcol');
-  this.contentContainer_ = this.createElement_('textarea', contentCell);
-  this.contentContainer_.style.width = '60%';
-  if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
-  goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
-  goog.events.listen(this.contentContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
-  this.contentContainer_.value = this.content_ || '';
-
-  goog.style.setUnselectable(element, false);
-
+    // Make content input
+    this.contentContainer_ = this.createElement_('textarea', centerArea);
+    this.contentContainer_.style.width = '60%';
+    if (this.type_ != Slide.TYPE_NORMAL) this.contentContainer_.disabled = true;
+    goog.events.listen(this.contentContainer_, goog.events.EventType.BLUR, goog.bind(this.saveEdit_, this));
+    goog.events.listen(this.contentContainer_, goog.events.EventType.MOUSEDOWN, goog.events.Event.stopPropagation);
+    this.contentContainer_.value = this.content_ || '';
+    this.contentContainer_.style.height = this.contentContainer_.scrollHeight + 'px';
+    goog.style.setUnselectable(element, false);
+    */
+  });
+  
   this.element_ = element;
   return element;
 }

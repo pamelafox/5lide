@@ -490,11 +490,12 @@ class SlideSetAction(BaseRequestHandler):
   def post(self):
     action = self.request.get('action')
     slides = self.request.get('slide', allow_multiple=True)
-    if not action in ['Delete']:
+    if not action in ['Delete slide']:
       self.error(403)
       return
-
+    logging.info(slides)
     for key in slides:
+      logging.info(key);
       slide = Slide.get(key)
 
       # Validate this user has access to this slide set
