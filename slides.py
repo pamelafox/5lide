@@ -37,6 +37,7 @@ from google.appengine.api import urlfetch
 from django.utils import simplejson
 
 import pdfcrowd
+import pdfcred
 
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
@@ -219,7 +220,7 @@ class SlideSetPage(BaseRequestHandler):
     # Workaround for newlines in JS output
     if output_name == 'edit':
       for slide in slides:
-        slide.content = slide.content.replace('\n', 'NEWLINE')
+        slide.content = slide.content.replace('\n', 'NEWLINE').replace('\r', '')
     
     template_name = 'slideset_%s.%s' % (output_type[1], output_type[2])
     template_values = {
@@ -230,7 +231,7 @@ class SlideSetPage(BaseRequestHandler):
         
     ### PDF
     if output_name == 'pdf':
-      client = pdfcrowd.Client('pamelafox', '77e03da88d43c882d4572df175cbbf27')
+      client = pdfcrowd.Client('pamelafox', pdfcred.password)
       client.usePrintMedia(True)
       pdf = client.convertHtml(self.get_html(template_name, template_values), self.response.out)
       
@@ -259,14 +260,24 @@ class CreateSlideSetAction(BaseRequestHandler):
       self.redirect('/set?id=' + str(slide_set.key()))
 
 class ImportSlideSetAction(BaseRequestHandler):
-  """ Imports a slideset from a Google presentation."""
+  """ Imports a slideset from a Google presentation or 5lide set."""
+  
   def post(self):
     user = users.get_current_user()
     url = self.request.get('url', 'https://docs.google.com/present/view?id=dggjrx3s_3435z2tmzdg')
     if not user or not url:
       self.error(403)
       return
-
+    
+    type = self.request.get('type', 'docs')
+    
+    if type == 'docs':
+      self.import_docs(user, url)
+    else:
+      self.import_5lide(user, url)
+    
+  def import_docs(self, user, url):
+  
     # construct URL for embedded presentation
     # URLs should have ?id = in them
     doc_id = url.split('id=')[1]
@@ -290,7 +301,6 @@ class ImportSlideSetAction(BaseRequestHandler):
 
       slides = doc_obj['children']
       for slide_id, slide_dict in slides.items():
-        logging.info(slide_id)
         slide_layout = slide_dict['attributes']['layout']
         # intro section normal
         layout_types = {'LAYOUT_TITLE_SLIDE': 'intro',
@@ -300,8 +310,6 @@ class ImportSlideSetAction(BaseRequestHandler):
         slide = Slide(type=slide_type, index=slide_index, slide_set=slide_set, title='',
                       subtitle='', content='')
         for slide_item_id, slide_item_dict in slide_dict['children'].items():
-          logging.info(slide_item_id)
-          logging.info(slide_item_dict)
           if 'type' not in slide_item_dict['attributes']: 
             continue
           slide_item_type = slide_item_dict['attributes']['type']
@@ -315,9 +323,50 @@ class ImportSlideSetAction(BaseRequestHandler):
           slide.put()
 
       self.redirect('/set?id=' + str(slide_set.key()))
-    # add each slide
-    # redirect
-
+      
+      
+  def import_5lide(self, user, url):
+    from BeautifulSoup import BeautifulSoup
+    result = urlfetch.fetch(url)
+    if result.status_code == 200:
+      soup = BeautifulSoup(result.content)
+      slide_set = SlideSet(name=str(soup.find('title').string))
+      slide_set.put()
+      slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
+      slide_set_member.put()
+      
+      slides = soup.findAll('div', 'slide')
+      counter = 0
+      for slide in slides:
+        slide_class = slide['class']
+        if slide_class.find('intro') > -1:
+          header = slide.find('header')
+          title = str(header.find('h1').string)
+          subtitle = str(header.find('h2').string)
+          if subtitle == 'None':
+            subtitle = ''
+          slide = Slide(type='intro', index=counter, slide_set=slide_set,
+            title=title, subtitle=subtitle, content='')
+          slide.put()
+        elif slide_class.find('section') > -1:
+          title = str(slide.find('header').find('h1').string)
+          slide = Slide(type='section', index=counter, slide_set=slide_set,
+            title=title, subtitle='', content='')
+          slide.put()
+        else: # normal
+          title = str(slide.find('header').find('h1').string)
+          content_tag = slide.find('section', 'content')
+          content = "".join([str(x) for x in content_tag.contents])  
+          slide = Slide(type='normal', index=counter, slide_set=slide_set,
+            title=title, subtitle='', content=unicode(content, errors='ignore'))
+          slide.put()
+        counter = counter + 1
+    else:
+      self.response.out.write('We couldn\'t load that URL for some reason, sorry!')
+      
+    self.redirect('/set?id=' + str(slide_set.key()))
+        
+      
 class EditSlideAction(BaseRequestHandler):
   """Edits a specific slide, changing its description.
 
