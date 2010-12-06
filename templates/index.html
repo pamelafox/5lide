@@ -119,18 +119,17 @@
   <div id="slidesetimport_dialog" class="dialog" style="display: none">
     <div class="title">Import Slide Set</div>
     <div class="content">
-      To import a Google presentation, you must publish it and paste the
-      publish link here.
+      You can import either existing 5lide-generated slidesets or Google presentations. <br>
+      Provide the URL of the 5lide set or the <b>published</b> Google presentation here:
       <form action="/importslideset.do" method="post" id="slidesetimport">
         <div class="form">
           <input type="hidden" name="slide" value=""/>
           <div class="field">
-            <div class="url">URL</div>
             <div class="value"><input name="url" type="text" size="70"/></div>
           </div>
           <div class="field">
+            <input name="type" value="5lide" type="radio" checked>5lide
             <input name="type" value="docs" type="radio">Docs
-            <input name="type" value="5lide" type="radio">5lide
           </div>
           <div class="buttons">
             <span class="button"><input type="submit" name="action" value="Import"/></span>
