@@ -202,17 +202,21 @@ class SlideSetPage(BaseRequestHandler):
 
     # Validate this user has access to this slide set. If not, they can
     # access the html view of this set only if it is published.
-    if not slide_set.current_user_has_access():
+    can_edit = False
+    if slide_set.current_user_has_access():
+      # Set user to pass into template values
+      can_edit = True
+    else:
       if slide_set.published:
+        # Redirect edit requests to view requests
         if output_name == 'edit':
           output_name = 'slide'
           output_type = SlideSetPage._OUTPUT_TYPES[output_name]
       else:
-        user = users.get_current_user()
-        if not user:
-          self.redirect(users.create_login_url(self.request.uri))
-        else:
+        if users.get_current_user():
           self.error(403)
+        else:
+          self.redirect(users.create_login_url(self.request.uri))
         return
 
     slides = list(slide_set.slide_set.order('index'))
@@ -224,6 +228,7 @@ class SlideSetPage(BaseRequestHandler):
     
     template_name = 'slideset_%s.%s' % (output_type[1], output_type[2])
     template_values = {
+        'can_edit': can_edit,
         'slide_set': slide_set,
         'slides': slides,
         'printable': self.request.get('printable')
@@ -262,19 +267,29 @@ class CreateSlideSetAction(BaseRequestHandler):
 class ImportSlideSetAction(BaseRequestHandler):
   """ Imports a slideset from a Google presentation or 5lide set."""
   
+  def get(self):
+    self.import_slideset()
+    
   def post(self):
+    self.import_slideset()
+    
+  def import_slideset(self):
     user = users.get_current_user()
-    url = self.request.get('url', 'https://docs.google.com/present/view?id=dggjrx3s_3435z2tmzdg')
-    if not user or not url:
+    if not user:
       self.error(403)
       return
     
+    url = self.request.get('url')
+    id = self.request.get('id')
     type = self.request.get('type', 'docs')
     
     if type == 'docs':
       self.import_docs(user, url)
-    else:
-      self.import_5lide(user, url)
+    elif type == '5lide':
+      if url:
+        self.import_5lide(user, url)
+      elif id:
+        self.import_5lide_by_id(user, id)
     
   def import_docs(self, user, url):
   
@@ -365,7 +380,23 @@ class ImportSlideSetAction(BaseRequestHandler):
       self.response.out.write('We couldn\'t load that URL for some reason, sorry!')
       
     self.redirect('/set?id=' + str(slide_set.key()))
-        
+    
+  def import_5lide_by_id(self, user, id):
+    # look up in datastore
+    slide_set_original = SlideSet.get(id)
+    slide_set_new = SlideSet(name=slide_set_original.name)
+    slide_set_new.put()
+    slide_set_member = SlideSetMember(slide_set=slide_set_new, user=user)
+    slide_set_member.put()
+    slides_new = []
+    for slide in slide_set_original.slide_set:
+      slide = Slide(type=slide.type, index=slide.index, slide_set=slide_set_new,
+      title=slide.title, subtitle=slide.subtitle, content=slide.content)
+      slides_new.append(slide)
+      slide.put()
+    db.put(slides_new)
+    self.redirect('/set?id=' + str(slide_set_new.key()))
+    
       
 class EditSlideAction(BaseRequestHandler):
   """Edits a specific slide, changing its description.

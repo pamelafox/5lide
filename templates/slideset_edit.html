@@ -121,7 +121,8 @@
               <div id="slidepreview">
                <header><h1 id="previewtitle"></h1><h1 id="previewsubtitle"></h1></header> 
                <section id="previewcontent" class="content">
-               Welcome to the new interface. You can rearrange slides by dragging the icons in the sidebar and select a given slide by clicking its title. As you edit the slide, you'll see an instant preview of what the HTML looks like (though not within the specified template). To delete a slide, select it and click 'Delete slide'. To insert a new slide (at the bottom), click 'New slide'.
+               <p>Welcome to the new interface. You can rearrange slides by dragging the icons in the sidebar and select a given slide by clicking its title. As you edit the slide, you'll see an instant preview of what the HTML looks like (though not within the specified template). To delete a slide, select it and click 'Delete slide'. To insert a new slide (at the bottom), click 'New slide'.</p>
+               <p><b>Tip:</b> To make it easy to escape code snippets on your slides, install the <a href="https://chrome.google.com/extensions/detail/keclieijlpebdohhelcbgncgdgifopbb/publish-accepted">HTML Escaper</a> extension for Chrome.</p>
                </section>
               </div>
             </td>
@@ -380,6 +381,11 @@ Slide.prototype.saveEdit_ = function() {
 
 // Saves this slide to the datastore on the server with an AJAX request.
 Slide.prototype.save = function() {
+  if (this.key_ == 'pending') {
+    window.setTimeout(this.save(), 2000);
+    return;
+  }
+  
   // Find index by figuring out which element it is beneath its parent
   var parentNode = this.element_.parentNode;
   for (var child = parentNode.firstChild, i = 0; child != null; child = child.nextSibling, i++) {
@@ -399,6 +405,9 @@ Slide.prototype.save = function() {
   ];
   if (this.key_) {
     args.push('slide=' + encodeURIComponent(this.key_));
+  } else {
+    // To mark the first save of a slide so we don't save twice without a key
+    this.key_ = 'pending';
   }
   goog.net.XhrIo.send('/editslide.do',
     goog.bind(this.onSave_, this),

@@ -38,7 +38,7 @@ header h1 {
   border-bottom: 1px dotted silver;
 }
 
-#presentation-counter, #info, .counter {
+#presentation-counter, #info, #topinfo, .counter {
   display: none
 }
     </style>
@@ -49,8 +49,29 @@ header h1 {
   </head> 
   <body> 
   
+  <div id="topinfo">
+    {% if user %}
+    <span class="item nickname">{{ user.nickname }}</span> |
+    {% endif %}
+    {% if can_edit %}
+    <a href="/set?id={{ slide_set.key }}">Edit Slideshow</a> |
+    {% endif %}
+    {% if user %}
+    <a href="/importslideset.do?id={{ slide_set.key }}&type=5lide">Copy Slideshow</a>
+    {% endif %}
+    <a href="/set?id={{ slide_set.key }}&output=pdf">Download PDF</a> |
+    {% if user %}
+    <span class="item"><a href="{{ logout_url|escape }}">Sign out</a></span>
+    {% else %}
+    <span class="item"><a href="{{ login_url|escape }}">Sign in</a></span>
+    {% endif %}
+    </p>
+  </div>
+  
   <div id="info">
-    <p>Press <span class="key">&rarr;</span> key to advance. Zoom in/out: <span class="key">Ctrl or Command</span> + <span class="key">+/-</span>. <a href="/set?id={{ slide_set.key }}&output=pdf">Download PDF</a> </p>
+    <p>Press <span class="key">&rarr;</span> key to advance.
+    Zoom in/out: <span class="key">Ctrl or Command</span> + <span class="key">+/-</span>.
+    </p>
   </div>
   
   <div id="presentation">

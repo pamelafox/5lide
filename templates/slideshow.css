@@ -10,10 +10,18 @@ body {
 }
 
 #info {
+  font-size: small;
   position: absolute;
   bottom: 0px;
-  font-size: 10px;
-  left: 30%;
+  left: 40%;
+  z-index: 500;
+}
+
+#topinfo {
+  font-size: small;
+  position: absolute;
+  top: 5px;
+  right: 5px;
   z-index: 500;
 }
 
@@ -23,7 +31,6 @@ body {
   padding: 3px 3px 3px 3px;
   text-shadow: none;
   letter-spacing: 0;
-  bottom: 5px;
   position: relative;
   background: white;
 }
@@ -293,14 +300,6 @@ video {
   -webkit-border-radius: 8px;
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.2);
-}
-
-
-
-
-:not(header) > .key {
-  margin: 0 5px;
-  bottom: 4px;
 }
 
 #presentation-counter {
