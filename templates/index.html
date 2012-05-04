@@ -2,18 +2,6 @@
 
 {% block head %}
   <script>
-  function newSlideSet() {
-    showDialog('slidesetform_dialog');
-    var form = document.getElementById("slidesetform");
-    form["name"].focus();
-  }
-
-  function importSlideSet() {
-    showDialog('slidesetimport_dialog');
-    var form = document.getElementById("slidesetimport");
-    form["url"].focus();
-  }
-
   function selectLists(all) {
     var inputs = document.getElementsByTagName("input");
     for (var i = 0; i < inputs.length; i++) {
@@ -39,32 +27,35 @@
 
 {% block body %}
   <form action="/inboxaction.do" method="post">
-    <div class="slidesarea">
+
       <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
-      <div class="menu">
-        <span class="item"><a href="javascript:newSlideSet()">New Slide Set</a></span>
-        <span class="item"><a href="javascript:importSlideSet()">Import Slide Set</a></span>
-      </div>
-      <div class="buttons top">
-        <div class="left corner"></div>
-        <div class="right corner"></div>
-        <div class="info">
-          <span class="count">{{ sets|length }} sets</span>
+
+      <div style="padding-top:20px; padding-left: 10px; padding-right: 10px;">
+        <button class="btn btn-primary" data-toggle="modal" href="#modal-newset">Create</button>
+        <button class="btn" data-toggle="modal" href="#modal-importset">Import</button>
+
+        <div class="pull-right" style="display:none">
+          <button class="btn" type="submit" name="action" onclick="return confirm('Are you sure you want to permanently delete the selected slide sets?')"/>Delete</button>
         </div>
-        <span class="button"><input type="submit" name="action" value="Delete" onclick="return confirm('Are you sure you want to permanently delete the selected slide sets?')"/></span>
       </div>
+
+      <div style="border-bottom: 1px solid #ccc;">&nbsp;</div>
+
       <div class="table">
-        <table>
-          <tr>
-            <th class="checkbox"><input type="checkbox" onclick="selectLists(this.checked)"/></th>
-            <th>Slide Sets</th>
-            <th>Collaborators</th>
-            <th>Last Edited</th>
-          </tr>
+        {% if sets %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="checkbox"><input type="checkbox" style="margin-left:0px;" onclick="selectLists(this.checked)"/></th>
+              <th>Slide Sets</th>
+              <th>Collaborators</th>
+              <th>Last Edited</th>
+            </tr>
+          <tbody>
           </tr>
           {% for list in sets %}
             <tr id="row{{ forloop.counter }}">
-              <td class="checkbox"><input class="listcheckbox" type="checkbox" name="list" value="{{ list.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
+              <td class="checkbox"><input class="listcheckbox" style="margin-left:0px;" type="checkbox" name="list" value="{{ list.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
               <td class="main">
                 <div class="name"><a {% if not list.archived %}class="active"{%endif %} href="/set?id={{ list.key|stringformat:"s"|urlencode }}">{{ list.name|escape }}</a></div>
               </td>
@@ -84,58 +75,57 @@
             </tr>
           {% endfor %}
         </table>
-        {% if not sets %}
-          <div class="message">You don't have any slide sets. To get started, <a href="javascript:newSlideSet()">create a new set</a>.</div>
         {% else %}
+        <div class="alert alert-block alert-info" style="margin: auto; width: 70%; margin-top: 60px;">
+          <h4 class="alert-heading">Welcome!</h4>
+          You don't have any slide sets. To get started, <a data-toggle="modal" href="#modal-newset">create a new set</a>.
+        </div>
         {% endif %}
       </div>
-      <div class="buttons bottom">
-        <div class="left corner"></div>
-        <div class="right corner"></div>
-        <span class="button"><input type="submit" name="action" value="Delete"/></span>
-      </div>
-    </div>
+
   </form>
 
-  <div id="slidesetform_dialog" class="dialog" style="display: none">
-    <div class="title">New Slide Set</div>
-    <div class="content">
-      <form action="/createslideset.do" method="post" id="slidesetform">
-        <div class="form">
-          <input type="hidden" name="slide" value=""/>
-          <div class="field">
-            <div class="name">Name</div>
-            <div class="value"><input name="name" type="text" size="70"/></div>
-          </div>
-          <div class="buttons">
-            <span class="button"><input type="submit" name="action" value="Create Slide Set"/></span>
-            <span class="button"><input type="button" value="Cancel" onclick="hideDialog()"/></span>
-          </div>
-        </div>
-      </form>
+  <div class="modal" id="modal-newset" style="display:none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>New Slide Set</h3>
     </div>
+    <form class="modal-form form-inline" action="/createslideset.do" method="post" id="slidesetform">
+      <div class="modal-body">
+          <input type="hidden" name="slide" value=""/>
+          <label>Name <input name="name" type="text" size="70"/></label>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" type="submit" name="action">Create Slide Set</button>
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
   </div>
 
-  <div id="slidesetimport_dialog" class="dialog" style="display: none">
-    <div class="title">Import Slide Set</div>
-    <div class="content">
-      You can import either existing 5lide-generated slidesets or Google presentations.<br>
-      Provide the URL of the 5lide set or the <b>published</b> Google presentation here:
-      <form action="/importslideset.do" method="post" id="slidesetimport">
-        <div class="form">
-          <input type="hidden" name="slide" value=""/>
-          <div class="field">
-            <div class="value"><input name="url" type="text" size="70"/></div>
-          </div>
-          <div class="field">
-            <input name="type" value="5lide" type="radio" checked>5lide
-            <input name="type" value="docs" type="radio">Docs
-          </div>
-          <div class="buttons">
-            <span class="button"><input type="submit" name="action" value="Import"/></span>
-            <span class="button"><input type="button" value="Cancel" onclick="hideDialog()"/></span>
-          </div>
-        </div>
-      </form>
+  <div class="modal" id="modal-importset" style="display: none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>Import Slide Set</h3>
+    </div>
+    <form class="modal-form form-inline" action="/importslideset.do" method="post" id="slidesetimport">
+      <div class="modal-body">
+        <p>
+        You can import either existing 5lide-generated slidesets or Google presentations.<br>
+        Provide the URL of the 5lide set or the <b>published</b> Google presentation here:
+        </p>
+        <input type="hidden" name="slide" value=""/>
+        <label>URL: <input name="url" type="text" size="70"/></label>
+        <br>
+        <label>Type:</label>
+          <label><input name="type" value="5lide" type="radio" checked>&nbsp; 5lide</label>
+          <label><input name="type" value="docs" type="radio">&nbsp; Docs</label>
+
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" type="submit" name="action">Import</button>
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
 
 {% endblock %}

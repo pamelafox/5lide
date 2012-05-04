@@ -73,128 +73,147 @@
 {% endblock %}
 
 {% block body %}
-  <h1>{{ slide_set.name|escape }}</h1>
-
   <form action="/slideset.do" method="post">
-    <div class="slidesarea">
-     <div class="collaborators">
-      <span class="label">Collaborators:</span>
-       {% for member in slide_set.slidesetmember_set %}{% ifequal member.user.email user.email %}Me{% else %}{{ member.user.nickname }}{% endifequal %}{% if not forloop.last %}/{% endif %}{% endfor %}
-      <input type="button" value="New" onclick="newCollaborator()"/>
-     </div>
-     <div class="menu">
-      <input type="button" value="Change Theme" onclick="changeTheme(this)">
-      <input id="publish_button" type="button" value="{% if slide_set.published %}Unpublish{% else %}Publish{% endif %}"
-        onclick="publishSlideSet(this)">
-     </div>
-      <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
-      <div class="buttons top">
-        <div class="left corner"></div>
-        <div class="right corner"></div>
-        <div class="info">
-          <span class="count">{{ slides|length }} slide(s)</span>
-          |
-          <span class="button"><a href="{{ request.uri|escape }}&amp;output=slide">View as Slideshow</a></span>
-        </div>
-        
-        <span class="button">
-          <input type="button" value="New slide" onclick="newSlide()"/>
-        </span>
-        
-        <span class="button"><input id="delete_button" name="action"
-          type="submit"
-          value="Delete slide" onclick="return confirm('Are you sure you want to permanently delete the selected slide?')"/></span>
-          
+
+    <!-- First subnav -->
+    <div class="subnav subnav-fixed" style="padding-top: 5px; padding-left: 20px; background: white; z-index:1020;">
+     
+     <h3 style="float: left; margin-top: 9px;">{{ slide_set.name|escape }}</h3>
+
+      <div class="pull-right">
+        <div class="btn-toolbar">
+          <div class="btn-group">
+            <a class="btn" href="{{ request.uri|escape }}&amp;output=slide">Start Presentation</a>
+          </div>
+          <div class="btn-group dropdown">
+            <a class="btn dropdown-toggle" data-toggle="dropdown">
+              Share
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#modal-addcollab" data-toggle="modal">Add collaborator</a>
+              <li><a id="button-unpublish" class="button-publish" href="javascript:doPublish(false);" style="display:{% if slide_set.published %}block;{% else %}none;{% endif %}">Un-Publish</a>
+              <li><a id="button-publish"   class="button-publish" href="#modal-publish" data-toggle="modal" style="display:{% if slide_set.published %}none;{% else %}block;{% endif %}">Publish</a>
+            </ul>
+          </div>
+          &nbsp; &nbsp; &nbsp; &nbsp; 
         </div>
       </div>
-      
-      <div id="slidemain" style="position:relative; width:100%; height: 600px;">
-       <table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0" style="height:600px;">
+   </div>
+
+   <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
+
+  <div class="subnav subnav-fixed subnav-background" style="top: 90px; padding-top:5px; padding-left: 20px; z-index: 1010;">
+
+    <div class="pull-left">
+      <span class="count">{{ slides|length }} slide(s)</span>
+
+      <a class="btn" type="button" href="#modal-newslide" data-toggle="modal"/><i class="icon-plus"></i></a>
+      <a class="btn" type="submit" onclick="return confirm('Are you sure you want to permanently delete the selected slide?')"/>
+      <i class="icon-remove"></i></a>
+    </div>
+
+    <div class="pull-right">
+      <a class="btn" type="button" href="#modal-changetheme" data-toggle="modal">Change Theme</a>
+      &nbsp; &nbsp; &nbsp; &nbsp; 
+    </div>
+
+  </div>
+
+  <div class="container-fluid" style="padding-top: 100px;">
+
+    <table width="100%" height="100%">
          <tbody>
           <tr valign="top">
-            <td id="sidebar" style="width:250px; padding: 4px; overflow:hidden; border-right:1px solid #C3D9FF;">
-              <div id="container" style="height: 600px; overflow-y:auto";>
-              </div>
+            <td id="sidebar" style="width:150px; padding: 4px; overflow:hidden; border-right:1px solid #ccc;">
+              <div id="container" style="overflow-y: auto; height: 643px; " ;="">
+              <div class="slidelist" style="position: relative; "></div></div>
             </td>
-            <td id="centertable" style="padding: 10px;" >
+            <td id="centertable" style="padding: 10px;">
               <div id="slideeditor"></div>
-              <div id="slidepreview">
-               <header><h1 id="previewtitle"></h1><h1 id="previewsubtitle"></h1></header> 
+
+              <div id="slidepreview" style="border-top: 1px solid #ccc;">
+               <h1 id="previewtitle"></h1>
+               <h1 id="previewsubtitle"></h1></header> 
                <section id="previewcontent" class="content">
-               <p>Welcome to the new interface. You can rearrange slides by dragging the icons in the sidebar and select a given slide by clicking its title. As you edit the slide, you'll see an instant preview of what the HTML looks like (though not within the specified template). To delete a slide, select it and click 'Delete slide'. To insert a new slide (at the bottom), click 'New slide'.</p>
-               <p><b>Tip:</b> To make it easy to escape code snippets on your slides, install the <a href="https://chrome.google.com/extensions/detail/keclieijlpebdohhelcbgncgdgifopbb/publish-accepted">HTML Escaper</a> extension for Chrome.</p>
                </section>
               </div>
             </td>
           </tr>
          </tbody>
-       </table>
-      </div>
-          
-    </div>
+    </table>
+
+  </div>
+
   </form>
 
-  <div id="memberform_dialog" class="dialog" style="display: none">
-    <div class="title">New Collaborator</div>
-    <div class="content">
-      <form action="/addmember.do" method="post" id="memberform">
-        <div class="form">
+
+  <div class="modal" id="modal-addcollab" style="display:none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>New Collaborator</h3>
+    </div>
+    <form class="modal-form form-inline" action="/addmember.do" method="post" id="memberform">
+      <div class="modal-body">
           <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
           <input type="hidden" name="set" value="{{ slide_set.key }}"/>
-          <div class="field">
-            <div class="name">Username</div>
-            <div class="value"><input name="email" type="text" size="10"/></div>
-          </div>
-          <div class="buttons">
-            <span class="button"><input type="submit" value="Add Collaborator"/></span>
-            <span class="button"><input type="button" value="Cancel" onclick="DialogBox.instance().close()"/></span>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
+          <label>Username: <input name="email" type="text" size="10"/></label>
 
-  <div id="publishform_dialog" class="dialog" style="display: none">
-    <div class="title">Publish Slide Set</div>
-    <div class="content">
-      <div class="form">
-        <div class="message">Publishing this slide set will make it visible to anyone (though only collaborators will be able to add/edit slides).  Are you sure you want to do this?</div>
-        <div class="buttons">
-          <span class="button"><input class="publishform_button" type="button" value="Yes, Publish Slide Set" onclick="doPublish(true)"/></span>
-          <span class="button"><input class="publishform_button" type="button" value="Cancel" onclick="closeDialog();"/></span>
-        </div>
       </div>
-    </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" type="submit">Add Collaborator</button>
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
   </div>
 
-  <div id="slidetype_dialog" class="dialog" style="display: none">
-    <div class="title">Pick Slide Type</div>
-    <div class="content">
-      <div class="form">
-        <input type="image" name="intro" src="/static/images/type_intro.png" onclick="slideSet.newSlide('intro'); closeDialog();">
-        <input type="image" name="normal" src="/static/images/type_normal.png"  onclick= "slideSet.newSlide('normal');  closeDialog();">
-        <input type="image" name="section" src="/static/images/type_section.png"  onclick="slideSet.newSlide('section');  closeDialog();">
-       </div>
-       <div class="buttons" style="text-align:right">
-          <span class="button"><input class="publishform_button" type="button" value="Cancel" onclick="closeDialog();"/></span>
-        </div>
-     </div>
-   </div>
+  <div class="modal" id="modal-publish" style="display:none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>Publish Slide Set</h3>
+    </div>
+      <div class="modal-body">
+        <p>Publishing this slide set will make it visible to anyone (though only collaborators will be able to add/edit slides).  Are you sure you want to do this?</p>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" type="submit" onclick="doPublish(true)" data-dismiss="modal">Yes, Publish!</button>
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
 
-   <div id="theme_dialog" class="dialog" style="display: none">
-    <div class="title">Change Theme</div>
-    <div class="content">
-      <div class="form">
-        <input type="image" style="width:80px;height:60px" src="/static/images/theme_normal.png"  onclick="slideSet.changeTheme('normal');  closeDialog();">
-        <input type="image" style="width:80px;height:60px" src="/static/images/theme_ballerina.png" onclick="slideSet.changeTheme('ballerina'); closeDialog();">
-        <input type="image" style="width:80px;height:60px" src="/static/images/theme_android.png"  onclick= "slideSet.changeTheme('android');  closeDialog();">
-        <input type="image" style="width:80px;height:60px" src="/static/images/theme_party.png"  onclick= "slideSet.changeTheme('party');  closeDialog();">
-       </div>
-       <div class="buttons" style="text-align:right">
-          <span class="button"><input class="publishform_button" type="button" value="Cancel" onclick="closeDialog();"/></span>
-        </div>
-     </div>
-   </div>
+  <div class="modal" id="modal-newslide" style="display:none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>Pick Slide Type</h3>
+    </div>
+      <div class="modal-body">
+         <input type="image" name="intro" src="/static/images/type_intro.png" onclick="slideSet.newSlide('intro');" data-dismiss="modal">
+        <input type="image" name="normal" src="/static/images/type_normal.png"  onclick= "slideSet.newSlide('normal');" data-dismiss="modal">
+        <input type="image" name="section" src="/static/images/type_section.png"  onclick="slideSet.newSlide('section');" data-dismiss="modal">
+      </div>
+      <div class="modal-footer">
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal" id="modal-changetheme" style="display:none">
+    <div class="modal-header">
+      <button class="close" data-dismiss="modal">×</button>
+      <h3>Change Theme</h3>
+    </div>
+      <div class="modal-body">
+        <input type="image" style="width:80px;height:60px" src="/static/images/theme_normal.png"  onclick="slideSet.changeTheme('normal');" data-dismiss="modal">
+        <input type="image" style="width:80px;height:60px" src="/static/images/theme_ballerina.png" onclick="slideSet.changeTheme('ballerina'); " data-dismiss="modal">
+        <input type="image" style="width:80px;height:60px" src="/static/images/theme_android.png"  onclick= "slideSet.changeTheme('android');" data-dismiss="modal">
+        <input type="image" style="width:80px;height:60px" src="/static/images/theme_party.png"  onclick= "slideSet.changeTheme('party');" data-dismiss="modal">
+      </div>
+      <div class="modal-footer">
+          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
 
 {% endblock %}
 
@@ -353,8 +372,6 @@ Slide.prototype.updatePreview_ = function() {
 // Check for Return/Escape key press events to stop editing. We save the
 // edit on Return, cancel the edit on escape.
 Slide.prototype.onEditKeyPress_ = function(e) {
-
-  
   if (e.keyCode == 13) {
     goog.events.Event.stopPropagation(e);
     this.saveEdit_();
@@ -519,44 +536,9 @@ SlideSet.prototype.newSlide = function(type) {
   this.makeDraggable_();
 }
 
-function newCollaborator() {
-  var form = document.getElementById("memberform");
-  showDialog('memberform_dialog');
-  form["email"].focus();
-}
-
-function changeTheme() {
-  showDialog('theme_dialog');
-}
-
-function publishSlideSet(button) {
-  var publish = button.value == "Publish";
-  if (publish) {
-    showDialog('publishform_dialog');
-  } else {
-    doPublish(false);
-  }
-}
-
-function newSlide() {
-  showDialog('slidetype_dialog');
-}
-
 function doPublish(publish) {
-  var dialog = document.getElementById("publishform_dialog");
-  var info = document.getElementById("publish_info");
-
   // Disable all the publish buttons as we make the request
-  var buttons = [document.getElementById("publish_button")];
-  var inputs = dialog.getElementsByTagName("input");
-  for (var i = 0; i < inputs.length; i++) {
-    if (inputs[i].type == "button") {
-      buttons.push(inputs[i]);
-    }
-  }
-  for (var i = 0; i < buttons.length; i++) {
-    buttons[i].disabled = true;
-  }
+  $('.button-publish').hide();
 
   // Make the request
   var body = "id={{ slide_set.key|stringformat:"s"|urlencode }}";
@@ -565,16 +547,12 @@ function doPublish(publish) {
   }
 
   goog.net.XhrIo.send('/publishslideset.do', function() {
-    buttons[0].value = publish ? "Unpublish" : "Publish";
     if (publish) {
-      closeDialog();
-      info.style.display = "";
+      $('#button-publish').show();
     } else {
-      info.style.display = "none";
+      $('#button-unpublish').show();
     }
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].disabled = false;
-    }
+    $('.button-publish').removeAttr('disabled');
   },
    'POST', body);
 }
@@ -587,9 +565,9 @@ var slideSet = new SlideSet(k, Slide.parseList([
   {% endfor %}
 ]));
 slideSet.attachToDOM(document.getElementById("container"));
+$('.slidelist .slide:first-child label').trigger('click');
 
-
-
+/*
 function resizeSlideArea() {
 
   function findPos(obj) {
@@ -615,6 +593,7 @@ function resizeSlideArea() {
 
 goog.events.listen(window, goog.events.EventType.RESIZE, resizeSlideArea);
 resizeSlideArea();
+*/
 
   </script>
 {% endblock %}

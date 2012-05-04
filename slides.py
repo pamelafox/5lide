@@ -36,9 +36,6 @@ from google.appengine.api import urlfetch
 
 from django.utils import simplejson
 
-import pdfcrowd
-import pdfcred
-
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
 
@@ -236,6 +233,9 @@ class SlideSetPage(BaseRequestHandler):
         
     ### PDF
     if output_name == 'pdf':
+      import pdfcred
+      import pdfcrowd
+
       client = pdfcrowd.Client('pamelafox', pdfcred.password)
       client.usePrintMedia(True)
       pdf = client.convertHtml(self.get_html(template_name, template_values), self.response.out)
