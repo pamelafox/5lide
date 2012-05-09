@@ -13,7 +13,7 @@
     {% include "slideshow.css" %}
     </style>
     {% if slide_set.theme %}
-    <link href="/static/css/theme_{{ slide_set.theme }}.css" rel="stylesheet" type="text/css"  media="projection, screen"/>
+    <link href="/viewer/css/themes/theme_{{ slide_set.theme }}.css" rel="stylesheet" type="text/css"  media="projection, screen"/>
     {% endif %}
     <style type="text/css" media="print">
 .slide {
@@ -43,8 +43,8 @@ header h1 {
 }
     </style>
     {% ifequal slide_set.theme "party" %}
-      <link href="/static/css/confetti.css" rel="stylesheet" type="text/css" media="projection, screen"/>
-      <script src="/static/javascript/confetti.js"></script>
+      <link href="/viewer/css/themes/confetti.css" rel="stylesheet" type="text/css" media="projection, screen"/>
+      <script src="/viewer/js/themes/confetti.js"></script>
     {% endifequal %}
   </head> 
   <body> 

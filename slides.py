@@ -43,6 +43,9 @@ _DEBUG = True
 # Add our custom Django template filters to the built in filters
 template.register_template_library('templatefilters')
 
+def is_devserver():
+    return os.environ['SERVER_SOFTWARE'].startswith('Dev')
+
 def remove_html_tags(data):
   p = re.compile(r'<.*?>')
   return p.sub('', data)
@@ -152,7 +155,8 @@ class BaseRequestHandler(webapp.RequestHandler):
         'login_url': users.create_login_url(self.request.uri),
         'logout_url': users.create_logout_url('http://%s/' % (
             self.request.host,)),
-        'debug': False,}
+        'debug': is_devserver() and False,
+        }
     values.update(template_values)
     directory = os.path.dirname(__file__)
     path = os.path.join(directory, os.path.join('templates', template_name)) 
