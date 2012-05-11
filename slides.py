@@ -73,11 +73,36 @@ class SlideSet(db.Model):
   Other than the slides referring to it, a SlideSet just has meta-data, like
   whether it is published and the date at which it was last updated.
   """
-  name = db.StringProperty(required=True)
-  created = db.DateTimeProperty(auto_now_add=True)
-  updated = db.DateTimeProperty(auto_now=True)
-  published = db.BooleanProperty(default=False)
-  theme = db.StringProperty()
+  title      = db.StringProperty(required=False)
+  created    = db.DateTimeProperty(auto_now_add=True)
+  updated    = db.DateTimeProperty(auto_now=True)
+  published  = db.BooleanProperty(default=False)
+  theme      = db.StringProperty()
+  flavor     = db.StringProperty()
+  slide_ids  = db.ListProperty(int)
+
+  def get_slides(self):
+    slide_keys = []
+    for id in self.slide_ids:
+      slide_keys.append(db.Key.from_path('Slide', id))
+    return db.get(slide_keys)
+
+  def to_dict(self, with_slides=False):
+    self_dict = {'title':    self.title,
+                'theme':     self.theme,
+                'published': self.published,
+                'slide_ids': self.slide_ids,
+                'flavor':    self.flavor}
+    if with_slides:
+      slides_dict = []
+      slides = self.get_slides()
+      for slide in slides:
+        slides_dict.append(slide.to_dict())
+      self_dict['slides'] = slides_dict
+    return self_dict
+
+  def to_json(self, with_slides=False):
+    return simplejson.dumps(self.to_dict(with_slides=with_slides))
 
   @staticmethod
   def get_current_user_sets():
@@ -104,6 +129,23 @@ class SlideSet(db.Model):
     return query.get()
 
 
+class Slide(db.Model):
+  """Represents a single slide in a slide set.
+  """
+
+  content = db.TextProperty()
+  index = db.IntegerProperty()
+  created = db.DateTimeProperty(auto_now_add=True)
+  updated = db.DateTimeProperty(auto_now=True)
+
+  def to_dict(self):
+    return {'id':        self.key().id(),
+            'content':   self.content}
+
+  def to_json(self):
+    return simplejson.dumps(self.to_dict())
+
+
 class SlideSetMember(db.Model):
   """Represents the many-to-many relationship between SlideSets and Users.
 
@@ -111,31 +153,6 @@ class SlideSetMember(db.Model):
   """
   slide_set = db.Reference(SlideSet, required=True)
   user = db.UserProperty(required=True)
-
-
-class Slide(db.Model):
-  """Represents a single slide in a slide set.
-
-  A slide can be one of several types with different sets of content
-    Intro: Title, SubTitle, Section
-    Section: Title, Section
-    Default: Title, Content, Section
-
-  """
-
-  TYPE_INTRO = 'intro'
-  TYPE_SECTION = 'section'
-  TYPE_NORMAL = 'normal'
-
-  type = db.StringProperty(required=True)
-  title = db.StringProperty()
-  subtitle = db.StringProperty()
-  section = db.StringProperty()
-  content = db.TextProperty()
-  index = db.IntegerProperty()
-  slide_set = db.Reference(SlideSet)
-  created = db.DateTimeProperty(auto_now_add=True)
-  updated = db.DateTimeProperty(auto_now=True)
 
 
 class BaseRequestHandler(webapp.RequestHandler):
@@ -155,12 +172,12 @@ class BaseRequestHandler(webapp.RequestHandler):
         'login_url': users.create_login_url(self.request.uri),
         'logout_url': users.create_logout_url('http://%s/' % (
             self.request.host,)),
-        'debug': is_devserver() and False,
+        'debug': is_devserver(),
         }
     values.update(template_values)
     directory = os.path.dirname(__file__)
     path = os.path.join(directory, os.path.join('templates', template_name)) 
-    return template.render(path, values, debug=_DEBUG)
+    return template.render(path, values)
     
 
 class InboxPage(BaseRequestHandler):
@@ -172,7 +189,7 @@ class InboxPage(BaseRequestHandler):
         'sets': sets})
 
 
-class SlideSetPage(BaseRequestHandler):
+class SlideSetViewPage(BaseRequestHandler):
   """Displays a single slide set based on ID.
 
   If the slide set is not published, we give a 403 unless the user is a
@@ -190,7 +207,7 @@ class SlideSetPage(BaseRequestHandler):
     'atom': ['application/atom+xml', 'atom', 'xml'],}
 
   def get(self):
-    slide_set = SlideSet.get(self.request.get('id'))
+    slide_set = SlideSet.get_by_id(int(self.request.get('id')))
     if not slide_set:
       self.error(403)
       return
@@ -220,7 +237,7 @@ class SlideSetPage(BaseRequestHandler):
           self.redirect(users.create_login_url(self.request.uri))
         return
 
-    slides = list(slide_set.slide_set.order('index'))
+    slides = list(slide_set.get_slides().order('index'))
 
     # Workaround for newlines in JS output
     if output_name == 'edit':
@@ -249,6 +266,39 @@ class SlideSetPage(BaseRequestHandler):
     self.generate(template_name, template_values)
 
 
+class SlideSetEditPage(BaseRequestHandler):
+
+  def get(self, slide_set_id):
+    slide_set = SlideSet.get_by_id(int(slide_set_id))
+    if not slide_set:
+      self.error(403)
+      return
+
+    can_edit = False
+    if slide_set.current_user_has_access():
+      can_edit = True
+    else:
+      if slide_set.published:
+        # redirect 
+        self.redirect('viewer/set/%s' % slide_set_id)
+      else:
+        if users.get_current_user():
+          self.error(403)
+        else:
+          self.redirect(users.create_login_url(self.request.uri))
+        return
+
+    template_name = 'slideset_edit.html'
+    template_values = {
+        'can_edit': can_edit,
+        'slide_set': slide_set
+        }
+      
+    self.response.headers['Content-Type'] = 'text/html'
+    self.generate(template_name, template_values)
+
+
+
 class CreateSlideSetAction(BaseRequestHandler):
   """Creates a new slide set for the current user."""
   def post(self):
@@ -258,7 +308,7 @@ class CreateSlideSetAction(BaseRequestHandler):
       self.error(403)
       return
 
-    slide_set = SlideSet(name=name)
+    slide_set = SlideSet(title=name)
     slide_set.put()
     slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
     slide_set_member.put()
@@ -266,345 +316,58 @@ class CreateSlideSetAction(BaseRequestHandler):
     if self.request.get('next'):
       self.redirect(self.request.get('next'))
     else:
-      self.redirect('/set?id=' + str(slide_set.key()))
+      self.redirect('/set?id=' + str(slide_set.key().id()))
 
-class ImportSlideSetAction(BaseRequestHandler):
-  """ Imports a slideset from a Google presentation or 5lide set."""
-  
-  def get(self):
-    self.import_slideset()
-    
-  def post(self):
-    self.import_slideset()
-    
-  def import_slideset(self):
-    user = users.get_current_user()
-    if not user:
-      self.error(403)
-      return
-    
-    url = self.request.get('url')
-    id = self.request.get('id')
-    type = self.request.get('type', 'docs')
-    
-    if type == 'docs':
-      self.import_docs(user, url)
-    elif type == '5lide':
-      if url:
-        self.import_5lide(user, url)
-      elif id:
-        self.import_5lide_by_id(user, id)
-    
-  def import_docs(self, user, url):
-  
-    # construct URL for embedded presentation
-    # URLs should have ?id = in them
-    doc_id = url.split('id=')[1]
-    embed_url = 'https://docs.google.com/present/embed?id=' + doc_id
-    # fetch HTML
-    result = urlfetch.fetch(embed_url)
-    if result.status_code == 200:
-      html = result.content
-      # parse to find the JSON
-      # need JSON fter initSlideshow
-      start = html.find('initSlideshow(') + 14
-      end = html.find('protocol') + 12
-      json = html[start:end]
-      doc_obj = simplejson.loads(json)
-      # create slide set
-      doc_title = doc_obj['attributes']['title']
-      slide_set = SlideSet(name=doc_title)
-      slide_set.put()
-      slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
-      slide_set_member.put()
 
-      slides = doc_obj['children']
-      for slide_id, slide_dict in slides.items():
-        slide_layout = slide_dict['attributes']['layout']
-        # intro section normal
-        layout_types = {'LAYOUT_TITLE_SLIDE': 'intro',
-                        'LAYOUT_TITLE_BODY_SLIDE': 'normal'}
-        slide_type = layout_types.get(slide_layout, 'normal')
-        slide_index = slide_dict['index']
-        slide = Slide(type=slide_type, index=slide_index, slide_set=slide_set, title='',
-                      subtitle='', content='')
-        for slide_item_id, slide_item_dict in slide_dict['children'].items():
-          if 'type' not in slide_item_dict['attributes']: 
-            continue
-          slide_item_type = slide_item_dict['attributes']['type']
-          slide_item_contents = slide_item_dict['attributes']['contents']
-          if slide_item_type == 'centeredTitle' or slide_item_type == 'title':
-            slide.title = remove_html_tags(slide_item_contents)
-          if slide_item_type == 'subtitle':
-            slide.subtitle = remove_html_tags(slide_item_contents)
-          if slide_item_type == 'body':
-            slide.content = remove_divs(slide_item_contents)
-          slide.put()
+class SlideAPI(webapp.RequestHandler):
 
-      self.redirect('/set?id=' + str(slide_set.key()))
-      
-      
-  def import_5lide(self, user, url):
-    from BeautifulSoup import BeautifulSoup
-    result = urlfetch.fetch(url)
-    if result.status_code == 200:
-      soup = BeautifulSoup(result.content)
-      slide_set = SlideSet(name=str(soup.find('title').string))
-      slide_set.put()
-      slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
-      slide_set_member.put()
-      
-      slides = soup.findAll('div', 'slide')
-      counter = 0
-      for slide in slides:
-        slide_class = slide['class']
-        if slide_class.find('intro') > -1:
-          header = slide.find('header')
-          title = str(header.find('h1').string)
-          subtitle = str(header.find('h2').string)
-          if subtitle == 'None':
-            subtitle = ''
-          slide = Slide(type='intro', index=counter, slide_set=slide_set,
-            title=title, subtitle=subtitle, content='')
-          slide.put()
-        elif slide_class.find('section') > -1:
-          title = str(slide.find('header').find('h1').string)
-          slide = Slide(type='section', index=counter, slide_set=slide_set,
-            title=title, subtitle='', content='')
-          slide.put()
-        else: # normal
-          title = str(slide.find('header').find('h1').string)
-          content_tag = slide.find('section', 'content')
-          content = "".join([str(x) for x in content_tag.contents])  
-          slide = Slide(type='normal', index=counter, slide_set=slide_set,
-            title=title, subtitle='', content=unicode(content, errors='ignore'))
-          slide.put()
-        counter = counter + 1
-    else:
-      self.response.out.write('We couldn\'t load that URL for some reason, sorry!')
-      
-    self.redirect('/set?id=' + str(slide_set.key()))
-    
-  def import_5lide_by_id(self, user, id):
-    # look up in datastore
-    slide_set_original = SlideSet.get(id)
-    slide_set_new = SlideSet(name=slide_set_original.name)
-    slide_set_new.put()
-    slide_set_member = SlideSetMember(slide_set=slide_set_new, user=user)
-    slide_set_member.put()
-    slides_new = []
-    for slide in slide_set_original.slide_set:
-      slide = Slide(type=slide.type, index=slide.index, slide_set=slide_set_new,
-      title=slide.title, subtitle=slide.subtitle, content=slide.content)
-      slides_new.append(slide)
-      slide.put()
-    db.put(slides_new)
-    self.redirect('/set?id=' + str(slide_set_new.key()))
-    
-      
-class EditSlideAction(BaseRequestHandler):
-  """Edits a specific slide, changing its description.
-
-  We also updated the last modified date of the slide set so that the
-  slide set inbox shows the correct last modified date for the list.
-
-  This can be used in an AJAX way or in a form. In a form, you should
-  supply a "next" argument that denotes the URL we should redirect to
-  after the edit is complete.
-  """
-  def post(self):
-    title = self.request.get('title')
-    if not title:
-      self.error(403)
-      return
-    type = self.request.get('type')
-    subtitle = self.request.get('subtitle')
-    content = self.request.get('content')
-    index = int(self.request.get('index'))
-
-    # Get the existing slide that we are editing
-    slide_key = self.request.get('slide')
-    if slide_key:
-      slide = Slide.get(slide_key)
-      if not slide:
-        self.error(403)
-        return
-      slide_set = slide.slide_set
-    else:
-      slide = None
-      slide_set = SlideSet.get(self.request.get('set'))
-
-    # Validate this user has access to this slide set
-    if not slide_set or not slide_set.current_user_has_access():
-      self.error(403)
-      return
-
-    # Create the slide
-    if slide:
-      slide.title = title
-      slide.subtitle = subtitle
-      slide.content = content
-      slide.index = index
-    else:
-      slide = Slide(type=type, title=title, slide_set=slide_set,
-                    content=content, index=index, subtitle=subtitle)
+  def post(self, slide_set_id, slide_id):
+    logging.info('Creating new slide')
+    content      = self.request.get('content')
+    slide_set    = SlideSet.get_by_id(int(slide_set_id))
+    slide = Slide()
+    slide.content = content  
     slide.put()
-
-    # Update the slide set so it's updated date is updated. Saving it is all
-    # we need to do since that field has auto_now=True
+    slide_set.slide_ids.append(slide.key().id())
     slide_set.put()
+    self.response.out.write(slide.to_json())
+  
+  def put(self, slide_set_id, slide_id):
+    logging.info('Updating existing slide')
+    body         = simplejson.loads(self.request.body)
+    content      = body['content']
+    slide = Slide.get_by_id(int(slide_id))
+    slide.content = content
+    slide.put()
+    self.response.out.write(slide.to_json())
 
-    # Only redirect if "next" is given
-    next = self.request.get('next')
-    if next:
-      self.redirect(next)
-    else:
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.out.write(str(slide.key()))
-
-
-class AddMemberAction(BaseRequestHandler):
-  """Adds a new User to a SlideSet ACL."""
-  def post(self):
-    slide_set = SlideSet.get(self.request.get('set'))
-    email = self.request.get('email')
-    if not slide_set or not email:
-      self.error(403)
-      return
-
-    # Validate this user has access to this slide set
-    if not slide_set.current_user_has_access():
-      self.error(403)
-      return
-
-    # Don't duplicate entries in the permissions datastore
-    user = users.User(email)
-    if not slide_set.user_has_access(user):
-      member = SlideSetMember(user=user, slide_set=slide_set)
-      member.put()
-    self.redirect(self.request.get('next'))
+  def get(self, slide_set_id, slide_id):
+    slide     = Slide.get_by_id(int(slide_id))
+    self.response.headers['Content-Type'] = 'application/json'
+    self.response.out.write(slide.to_json())
 
 
-class InboxAction(BaseRequestHandler):
-  """Performs an action in the user's SlideSet inbox.
+class SlideSetAPI(webapp.RequestHandler):
 
-  We support Archive, Unarchive, and Delete actions. The action is specified
-  by the "action" argument in the POST. The names are capitalized because
-  they correspond to the text in the buttons in the form, which all have the
-  name "action".
-  """
-  def post(self):
-    action = self.request.get('action')
-    sets = self.request.get('set', allow_multiple=True)
-    if not action in ['Delete']:
-      self.error(403)
-      return
-
-    for key in sets:
-      slide_set = SlideSet.get(key)
-
-      # Validate this user has access to this slide set
-      if not slide_set or not slide_set.current_user_has_access():
-        self.error(403)
-        return
-
-
-      for member in slide_set.slidesetmember_set:
-        member.delete()
-      for slide in slide_set.slide_set:
-        slide.delete()
-      slide_set.delete()
-
-    self.redirect(self.request.get('next'))
-
-
-class SlideSetAction(BaseRequestHandler):
-  """Performs an action on a specific slide set.
-  by the "action" argument in the POST.
-  """
-  def post(self):
-    action = self.request.get('action')
-    slides = self.request.get('slide', allow_multiple=True)
-    if not action in ['Delete slide']:
-      self.error(403)
-      return
-    logging.info(slides)
-    for key in slides:
-      logging.info(key);
-      slide = Slide.get(key)
-
-      # Validate this user has access to this slide set
-      if not slide or not slide.slide_set.current_user_has_access():
-        self.error(403)
-        return
-
-      slide.delete()
-
-    self.redirect(self.request.get('next'))
-
-
-class SetSlidePositionsAction(BaseRequestHandler):
-  """Orders the slides in a slide sets.
-
-  The input to this handler is a comma-separated list of slide keys in the
-  "slides" argument to the post. We assign index to slides based on that order
-  (e.g., 1 through N for N slides).
-  """
-  def post(self):
-    keys = self.request.get('slides').split(',')
-    if not keys:
-      self.error(403)
-      return
-    num_keys = len(keys)
-    for i, key in enumerate(keys):
-      key = keys[i]
-      slide = Slide.get(key)
-      if not slide or not slide.slide_set.current_user_has_access():
-        self.error(403)
-        return
-      # Index is 1-based
-      slide.index = (i + 1)
-      slide.put()
-
-
-class PublishSlideSetAction(BaseRequestHandler):
-  """Publishes a given slide set, which makes it viewable by everybody."""
-  def post(self):
-    slide_set = SlideSet.get(self.request.get('id'))
-    if not slide_set or not slide_set.current_user_has_access():
-      self.error(403)
-      return
-
-    slide_set.published = bool(self.request.get('publish'))
-    slide_set.put()
-
-class ChangeThemeAction(BaseRequestHandler):
-  """Publishes a given slide set, which makes it viewable by everybody."""
-
-  def post(self):
-    slide_set = SlideSet.get(self.request.get('id'))
-    if not slide_set or not slide_set.current_user_has_access():
-      self.error(403)
-      return
-
-    slide_set.theme = self.request.get('theme')
-    slide_set.put()
+  def post(self, slide_set_id):
+    # make changes - theme, published, title, order
+    pass
+  
+  def get(self, slide_set_id):
+    slide_set    = SlideSet.get_by_id(int(slide_set_id))
+    self.response.headers['Content-Type'] = 'application/json'
+    self.response.out.write(slide_set.to_json(with_slides=True))
 
 
 def main():
   application = webapp.WSGIApplication([
       ('/', InboxPage),
-      ('/list', SlideSetPage),
-      ('/set', SlideSetPage),
-      ('/editslide.do', EditSlideAction),
+      ('/edit/set/(.*)',           SlideSetEditPage),
+      ('/view/set/(.*)',           SlideSetViewPage),
+      ('/api/set/(.*)/slide/(.*)', SlideAPI),
+      ('/api/set/(.*)',            SlideSetAPI),
       ('/createslideset.do', CreateSlideSetAction),
-      ('/importslideset.do', ImportSlideSetAction),
-      ('/addmember.do', AddMemberAction),
-      ('/inboxaction.do', InboxAction),
-      ('/slideset.do', SlideSetAction),
-      ('/publishslideset.do', PublishSlideSetAction),
-      ('/changetheme.do', ChangeThemeAction),
-      ('/setslidepositions.do', SetSlidePositionsAction)], debug=_DEBUG)
+      ], debug=_DEBUG)
   run_wsgi_app(application)
 
 

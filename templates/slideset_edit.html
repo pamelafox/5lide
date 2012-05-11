@@ -73,12 +73,11 @@
 {% endblock %}
 
 {% block body %}
-  <form action="/slideset.do" method="post">
-
+  
     <!-- First subnav -->
     <div class="subnav subnav-fixed" style="padding-top: 5px; padding-left: 20px; background: white; z-index:1020;">
      
-     <h3 style="float: left; margin-top: 9px;">{{ slide_set.name|escape }}</h3>
+      <h3 id="slide-set-title" style="float: left; margin-top: 9px;"></h3>
 
       <div class="pull-right">
         <div class="btn-toolbar">
@@ -104,12 +103,11 @@
    <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
 
   <div class="subnav subnav-fixed subnav-background" style="top: 90px; padding-top:5px; padding-left: 20px; z-index: 1010;">
-
     <div class="pull-left">
-      <span class="count">{{ slides|length }} slide(s)</span>
+      <span id="slide-set-count" class="count"> slide(s)</span>
 
-      <a class="btn" type="button" href="#modal-newslide" data-toggle="modal"/><i class="icon-plus"></i></a>
-      <a class="btn" type="submit" onclick="return confirm('Are you sure you want to permanently delete the selected slide?')"/>
+      <a id="new-slide-button" class="btn" type="button" data-toggle="modal"/><i class="icon-plus"></i></a>
+      <a id="delete-slide-button" class="btn" type="submit" onclick="return confirm('Are you sure you want to permanently delete the selected slide?')"/>
       <i class="icon-remove"></i></a>
     </div>
 
@@ -117,7 +115,6 @@
       <a class="btn" type="button" href="#modal-changetheme" data-toggle="modal">Change Theme</a>
       &nbsp; &nbsp; &nbsp; &nbsp; 
     </div>
-
   </div>
 
   <div class="container-fluid" style="padding-top: 100px;">
@@ -127,10 +124,25 @@
           <tr valign="top">
             <td id="sidebar" style="width:150px; padding: 4px; overflow:hidden; border-right:1px solid #ccc;">
               <div id="container" style="overflow-y: auto; height: 643px; " ;="">
-              <div class="slidelist" style="position: relative; "></div></div>
+                <div id="slide-thumbs" style="position: relative; ">
+
+                  <script type="text/template" id="slide-thumb-template">
+                    <div class="slide-thumb" style="position: relative; visibility: visible; ">
+                      <img style="cursor: move; height: 30px; width: 40px; vertical-align: middle; margin-right: 10px; " alt="Drag to reorder slides" src="/editor/img/type_normal.png">
+                        <label style="font-weight: bold; cursor: pointer; text-decoration: underline; " class="slide-thumb-title">
+                        <%= title %>
+                        </label>
+                    </div>
+                  </script>
+
+                </div>
+              </div>
             </td>
-            <td id="centertable" style="padding: 10px;">
-              <div id="slideeditor"></div>
+            <td style="padding: 10px;">
+
+              <div id="slide-edit-area" style="display:none;">
+                <textarea id="slide-edit-textarea" style="width: 100%; height: 44px;"></textarea>
+              </div>
 
               <div id="slidepreview" style="border-top: 1px solid #ccc;">
                <h1 id="previewtitle"></h1>
@@ -182,22 +194,6 @@
     </form>
   </div>
 
-  <div class="modal" id="modal-newslide" style="display:none">
-    <div class="modal-header">
-      <button class="close" data-dismiss="modal">×</button>
-      <h3>Pick Slide Type</h3>
-    </div>
-      <div class="modal-body">
-         <input type="image" name="intro" src="/editor/img/type_intro.png" onclick="slideSet.newSlide('intro');" data-dismiss="modal">
-        <input type="image" name="normal" src="/editor/img/type_normal.png"  onclick= "slideSet.newSlide('normal');" data-dismiss="modal">
-        <input type="image" name="section" src="/editor/img/type_section.png"  onclick="slideSet.newSlide('section');" data-dismiss="modal">
-      </div>
-      <div class="modal-footer">
-          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
-      </div>
-    </form>
-  </div>
-
   <div class="modal" id="modal-changetheme" style="display:none">
     <div class="modal-header">
       <button class="close" data-dismiss="modal">×</button>
@@ -218,13 +214,5 @@
 {% endblock %}
 
 {% block readyscript %}
-var k = "{{ slide_set.key }}";
-slideSet = new SlideSet(k, Slide.parseList([
-  {% for slide in slides %}
-    [k, "{{ slide.key }}", "{{slide.type}}", "{{slide.title|addslashes}}",
-    "{{slide.subtitle|addslashes}}", "{{slide.content|addslashes}}" ] {% if not forloop.last %},{% endif %}
-  {% endfor %}
-]));
-slideSet.attachToDOM(document.getElementById("container"));
-$('.slidelist .slide:first-child label').trigger('click');
+
 {% endblock %}

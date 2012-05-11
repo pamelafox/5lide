@@ -6,7 +6,7 @@
     var inputs = document.getElementsByTagName("input");
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
-      if (input.type == "checkbox" && input.className == "listcheckbox") {
+      if (input.type == "checkbox" && input.className == "setcheckbox") {
         var id = input.id.substring(8);
         var row = document.getElementById("row" + id);
         input.checked = all;
@@ -53,14 +53,14 @@
             </tr>
           <tbody>
           </tr>
-          {% for list in sets %}
+          {% for set in sets %}
             <tr id="row{{ forloop.counter }}">
-              <td class="checkbox"><input class="listcheckbox" style="margin-left:0px;" type="checkbox" name="list" value="{{ list.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
+              <td class="checkbox"><input class="setcheckbox" style="margin-left:0px;" type="checkbox" name="set" value="{{ set.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
               <td class="main">
-                <div class="name"><a {% if not list.archived %}class="active"{%endif %} href="/set?id={{ list.key|stringformat:"s"|urlencode }}">{{ list.name|escape }}</a></div>
+                <div class="name"><a {% if not set.archived %}class="active"{%endif %} href="/set?id={{ set.key.id }}">{{ set.title|escape }}</a></div>
               </td>
               <td class="members">
-                {% for member in list.slidesetmember_set %}
+                {% for member in set.slidesetmember_set %}
                   {% ifequal member.user.email user.email %}
                     Me
                   {% else %}
@@ -70,7 +70,7 @@
                 {% endfor %}
               </td>
               <td class="date">
-                {{ list.updated|date:"D, M j, Y \a\t P" }}
+                {{ set.updated|date:"D, M j, Y \a\t P" }}
               </td>
             </tr>
           {% endfor %}
