@@ -10,82 +10,6 @@
 
 // Be able to change theme, change title, change publish state
 
-/**
- * MODELS ***********************
- */
-var Slide = Backbone.Model.extend({
-
-  defaults: function() {
-    return {
-      setId: null,
-      title: 'Untitled',
-      content: ''
-    };
-  },
-
-  url : function() {
-    return '/api/set/' + this.get('setId') + '/slide/' + this.id;
-  },
-
-  initialize: function() {
-    _.bindAll(this, 'update');
-    this.bind('change:content', this.update);
-  },
-
-  update: function() {
-    // Set title to first h1 or h2 or h3 that we find in the content
-    var $contentAsHtml = $('<div>' + this.get('content') + '</div>');
-    var autoTitle = $contentAsHtml.find('h1').text();
-    if (!autoTitle) {
-      autoTitle = $.trim(this.get('content')).split(' ')[0];
-    }
-    this.set({'title': autoTitle});
-  }
-
-});
-
-// its more backboey to fetch on collections
-var SlideCollection = Backbone.Collection.extend({
-  model: Slide
-});
-
-var SlideSet = Backbone.Model.extend({
-
-  // Default attributes for the todo item.
-  defaults: function() {
-    return {
-      id: null,
-      title: '',
-      theme: null,
-      slides: []
-    };
-  },
-
-  url : function() {
-    // Change to more RESTful later
-    return '/api/set/' + this.id;
-  },
- 
-  // override parse
-  // should return the attributes hash to be set on the model. 
-  /*
-  parse: function(resp) {
-
-  },
-  */
-
-  // {slides: [{}, {}]}
-  initialize : function() {
-    this.slides = new SlideCollection();
-  }
-
-});
-
-
-/**
- * VIEWS ***********************
- */
-
 var SlideView = Backbone.View.extend({
   el: 'body',
 
@@ -190,8 +114,6 @@ var SlideSetView = Backbone.View.extend({
 
     // Should do bootstrapping instead - http://documentcloud.github.com/backbone/#FAQ-bootstrap
     this.slideSet.fetch();
-
-    console.log(this.slideSet);
   },
 
   render: function() {
@@ -214,11 +136,8 @@ var SlideSetView = Backbone.View.extend({
   },
 
   onNewSlide: function(slide) {
-    console.log('on new slide');
     var slideView = new SlideView({model: slide});
     slideView.render();
-    // thumbView is undefined?
-    // this.$('#slidelist').append(slideView.thumbView.render().el);
   }
 
 });

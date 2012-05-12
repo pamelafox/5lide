@@ -39,33 +39,11 @@ from django.utils import simplejson
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
 
-
 # Add our custom Django template filters to the built in filters
 template.register_template_library('templatefilters')
 
 def is_devserver():
     return os.environ['SERVER_SOFTWARE'].startswith('Dev')
-
-def remove_html_tags(data):
-  p = re.compile(r'<.*?>')
-  return p.sub('', data)
-
-def remove_divs(data):
-  p = re.compile(r'<[/]*div.*?>')
-  data = p.sub('', data)
-  # And spans..
-  # TODO: Replace the monospace spans with PRE tags.
-  # Maybe use BeautifulSoup
-  p = re.compile(r'<[/]*span.*?>')
-  data = p.sub('', data)
-  p = re.compile(r'<[/]*font.*?>')
-  data = p.sub('', data)
-  # And styles.. most styles don't matter
-  p = re.compile(r' style=".*?"')
-  data = p.sub('', data)
-  # And silly clear="none" on brs
-  data = data.replace(' clear="none"', '')
-  return data
 
 class SlideSet(db.Model):
   """A SlideSet is that encompasses all the slides.
@@ -80,6 +58,7 @@ class SlideSet(db.Model):
   theme      = db.StringProperty()
   flavor     = db.StringProperty()
   slide_ids  = db.ListProperty(int)
+  creator     = db.UserProperty()
 
   def get_slides(self):
     slide_keys = []
@@ -87,22 +66,42 @@ class SlideSet(db.Model):
       slide_keys.append(db.Key.from_path('Slide', id))
     return db.get(slide_keys)
 
+  def remove_slide(self, slide_id):
+    try:
+      self.slide_ids.remove(int(slide_id))
+      self.save()
+      return True
+    except ValueError:
+      logging.info('Slide id not in list')
+      return False
+
   def to_dict(self, with_slides=False):
     self_dict = {'title':    self.title,
                 'theme':     self.theme,
                 'published': self.published,
-                'slide_ids': self.slide_ids,
+                'slideIds': self.slide_ids,
                 'flavor':    self.flavor}
     if with_slides:
       slides_dict = []
       slides = self.get_slides()
       for slide in slides:
-        slides_dict.append(slide.to_dict())
+        if slide is None:
+          continue
+        slide_dict = slide.to_dict()
+        slide_dict['setId'] = self.key().id()
+        slides_dict.append(slide_dict)
       self_dict['slides'] = slides_dict
     return self_dict
 
   def to_json(self, with_slides=False):
     return simplejson.dumps(self.to_dict(with_slides=with_slides))
+
+  def current_user_has_access(self):
+    return self.user_has_access(users.get_current_user())
+  
+  def user_has_access(self, user):
+    return True
+    #return (user.email == self.creator.email)
 
   @staticmethod
   def get_current_user_sets():
@@ -111,22 +110,11 @@ class SlideSet(db.Model):
 
   @staticmethod
   def get_user_sets(user):
-    """Returns the slide sets that the given user has access to."""
-    if not user: return []
-    memberships = db.Query(SlideSetMember).filter('user =', user)
-    return [m.slide_set for m in memberships]
-
-  def current_user_has_access(self):
-    """Returns true if the current user has access to this slide set."""
-    return self.user_has_access(users.get_current_user())
-
-  def user_has_access(self, user):
-    """Returns true if the given user has access to this slide set."""
-    if not user: return False
-    query = db.Query(SlideSetMember)
-    query.filter('slide_set =', self)
-    query.filter('user =', user)
-    return query.get()
+    """Returns the slidesets that the given user has access to."""
+    if not user: 
+      return []
+    slide_sets = SlideSet.all().filter('creator =', user)
+    return slide_sets
 
 
 class Slide(db.Model):
@@ -144,15 +132,6 @@ class Slide(db.Model):
 
   def to_json(self):
     return simplejson.dumps(self.to_dict())
-
-
-class SlideSetMember(db.Model):
-  """Represents the many-to-many relationship between SlideSets and Users.
-
-  This is essentially the slide set Access Control List (ACL).
-  """
-  slide_set = db.Reference(SlideSet, required=True)
-  user = db.UserProperty(required=True)
 
 
 class BaseRequestHandler(webapp.RequestHandler):
@@ -202,7 +181,6 @@ class SlideSetViewPage(BaseRequestHandler):
   # template file extensions
   _OUTPUT_TYPES = {
     'pdf': ['application/pdf', 'slide', 'html'],
-    'edit': ['text/html', 'edit', 'html'],
     'slide': ['text/html', 'slide', 'html'],
     'atom': ['application/atom+xml', 'atom', 'xml'],}
 
@@ -220,30 +198,14 @@ class SlideSetViewPage(BaseRequestHandler):
 
     # Validate this user has access to this slide set. If not, they can
     # access the html view of this set only if it is published.
-    can_edit = False
-    if slide_set.current_user_has_access():
-      # Set user to pass into template values
-      can_edit = True
-    else:
-      if slide_set.published:
-        # Redirect edit requests to view requests
-        if output_name == 'edit':
-          output_name = 'slide'
-          output_type = SlideSetPage._OUTPUT_TYPES[output_name]
+    if not slide_set.current_user_has_access() and not slide_set.published:
+      if users.get_current_user():
+        self.error(403)
       else:
-        if users.get_current_user():
-          self.error(403)
-        else:
-          self.redirect(users.create_login_url(self.request.uri))
-        return
-
+        self.redirect(users.create_login_url(self.request.uri))
+      return
     slides = list(slide_set.get_slides().order('index'))
 
-    # Workaround for newlines in JS output
-    if output_name == 'edit':
-      for slide in slides:
-        slide.content = slide.content.replace('\n', 'NEWLINE').replace('\r', '')
-    
     template_name = 'slideset_%s.%s' % (output_type[1], output_type[2])
     template_values = {
         'can_edit': can_edit,
@@ -252,7 +214,6 @@ class SlideSetViewPage(BaseRequestHandler):
         'printable': self.request.get('printable')
         }
         
-    ### PDF
     if output_name == 'pdf':
       import pdfcred
       import pdfcrowd
@@ -260,7 +221,6 @@ class SlideSetViewPage(BaseRequestHandler):
       client = pdfcrowd.Client('pamelafox', pdfcred.password)
       client.usePrintMedia(True)
       pdf = client.convertHtml(self.get_html(template_name, template_values), self.response.out)
-      
       
     self.response.headers['Content-Type'] = output_type[0]
     self.generate(template_name, template_values)
@@ -279,7 +239,6 @@ class SlideSetEditPage(BaseRequestHandler):
       can_edit = True
     else:
       if slide_set.published:
-        # redirect 
         self.redirect('viewer/set/%s' % slide_set_id)
       else:
         if users.get_current_user():
@@ -298,75 +257,103 @@ class SlideSetEditPage(BaseRequestHandler):
     self.generate(template_name, template_values)
 
 
+class APIHandler(webapp.RequestHandler):
 
-class CreateSlideSetAction(BaseRequestHandler):
-  """Creates a new slide set for the current user."""
-  def post(self):
-    user = users.get_current_user()
-    name = self.request.get('name')
-    if not user or not name:
-      self.error(403)
-      return
+  def get_body(self):
+    return simplejson.loads(self.request.body)
 
-    slide_set = SlideSet(title=name)
-    slide_set.put()
-    slide_set_member = SlideSetMember(slide_set=slide_set, user=user)
-    slide_set_member.put()
+  def get_slide(self, slide_id):
+    return Slide.get_by_id(int(slide_id))
 
-    if self.request.get('next'):
-      self.redirect(self.request.get('next'))
-    else:
-      self.redirect('/set?id=' + str(slide_set.key().id()))
+  def get_slide_set(self, slide_set_id):
+    return SlideSet.get_by_id(int(slide_set_id))
 
+  def write_error(self, error):
+    return '{"status": "error"}'
 
-class SlideAPI(webapp.RequestHandler):
+class SlideAPI(APIHandler):
 
-  def post(self, slide_set_id, slide_id):
-    logging.info('Creating new slide')
-    content      = self.request.get('content')
-    slide_set    = SlideSet.get_by_id(int(slide_set_id))
+  def post(self, slide_set_id):
+    slide_set    = self.get_slide_set(slide_set_id)
     slide = Slide()
-    slide.content = content  
     slide.put()
     slide_set.slide_ids.append(slide.key().id())
     slide_set.put()
     self.response.out.write(slide.to_json())
+
+  def get(self, slide_set_id, slide_id):
+    slide = self.get_slide(slide_id)
+    self.response.headers['Content-Type'] = 'application/json'
+    self.response.out.write(slide.to_json())
   
   def put(self, slide_set_id, slide_id):
-    logging.info('Updating existing slide')
-    body         = simplejson.loads(self.request.body)
+    body         = self.get_body()
     content      = body['content']
-    slide = Slide.get_by_id(int(slide_id))
+    slide = self.get_slide(slide_id)
     slide.content = content
     slide.put()
     self.response.out.write(slide.to_json())
 
-  def get(self, slide_set_id, slide_id):
-    slide     = Slide.get_by_id(int(slide_id))
-    self.response.headers['Content-Type'] = 'application/json'
-    self.response.out.write(slide.to_json())
+  def delete(self, slide_set_id, slide_id):
+    slide_set    = self.get_slide_set(slide_set_id)
+    if not slide_set.remove_slide(slide_id):
+      self.write_error()
 
 
-class SlideSetAPI(webapp.RequestHandler):
+class SlideSetAPI(APIHandler):
 
-  def post(self, slide_set_id):
-    # make changes - theme, published, title, order
-    pass
-  
+  def post(self):
+    body         = self.get_body()
+    title        = body['title']
+    user         = users.get_current_user()
+    if not user:
+      self.error(403)
+      return
+    slide_set = SlideSet(title=title, creator=user)
+    slide_set.put()
+    slide_set_member = SlideSetAuthor(slide_set=slide_set, user=user)
+    slide_set_member.put()
+    self.response.out.write(slide_set.to_json(with_slides=True))
+
   def get(self, slide_set_id):
     slide_set    = SlideSet.get_by_id(int(slide_set_id))
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(slide_set.to_json(with_slides=True))
+  
+  def put(self, slide_set_id):
+    slide_set    = SlideSet.get_by_id(int(slide_set_id))
+    body         = simplejson.loads(self.request.body)
+    title        = body['title']
+    published    = body['published']
+    flavor       = body['flavor']
+    theme        = body['theme']
+    slide_ids    = body['slide_ids']
+    if title:
+      slide_set.title     = title
+    if published:
+      slide_set.published = published
+    if flavor:
+      slide_set.flavor    = flavor
+    if theme:
+      slide_set.theme     = theme
+    if slide_ids:
+      slide_set.slide_ids = slide_ids
+    slide_set.put()
+    self.response.out.write(slide_set.to_json(with_slides=True))
 
+  def delete(self, slide_set_id):
+    slide_set    = SlideSet.get_by_id(int(slide_set_id))
+    slide_set.delete()
 
 def main():
   application = webapp.WSGIApplication([
       ('/', InboxPage),
       ('/edit/set/(.*)',           SlideSetEditPage),
       ('/view/set/(.*)',           SlideSetViewPage),
-      ('/api/set/(.*)/slide/(.*)', SlideAPI),
-      ('/api/set/(.*)',            SlideSetAPI),
-      ('/createslideset.do', CreateSlideSetAction),
+      ('/api/sets/(.*)/slides/(.*)', SlideAPI),
+      ('/api/sets/(.*)/slides',      SlideAPI),
+      ('/api/sets/(.*)',             SlideSetAPI),
+      ('/api/sets',                  SlideSetAPI),
       ], debug=_DEBUG)
   run_wsgi_app(application)
 
