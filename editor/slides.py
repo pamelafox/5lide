@@ -39,9 +39,6 @@ from django.utils import simplejson
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
 
-# Add our custom Django template filters to the built in filters
-template.register_template_library('templatefilters')
-
 def is_devserver():
     return os.environ['SERVER_SOFTWARE'].startswith('Dev')
 

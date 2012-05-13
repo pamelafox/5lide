@@ -193,5 +193,3 @@ var SlideSetView = Backbone.View.extend({
   }
 
 });
-
-new SlideSetView();

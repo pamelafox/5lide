@@ -1,4 +1,4 @@
-application: 5lide-maker
+application: 5lide-viewer
 version: new
 runtime: python
 api_version: 1
@@ -7,12 +7,6 @@ handlers:
 - url: /favicon.ico
   static_files: favicon.ico
   upload: favicon.ico
-
-- url: /editor
-  static_dir: editor
-
-- url: /viewer
-  static_dir: viewer
 
 - url: .*
   script: slides.py

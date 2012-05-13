@@ -119,6 +119,10 @@
 
 {% endblock %}
 
-{% block readyscript %}
+{% block bottomscript %}
+<script src="/src/js/app/views.js" type="text/javascript"></script>
+{% endblock %}
 
+{% block readyscript %}
+new SlideSetView();
 {% endblock %}

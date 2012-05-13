@@ -7,5 +7,5 @@ editor:
 viewer:
 	cd viewer; grunt; cd ../;
 
-deploy:
+deploy-editor:
 	/usr/local/bin/appcfg.py update .;
