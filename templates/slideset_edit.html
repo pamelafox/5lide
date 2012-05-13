@@ -25,20 +25,8 @@
 
       <div class="pull-right">
         <div class="btn-toolbar">
-          <div class="btn-group">
-            <a class="btn" target="_blank" href="{{ request.uri|escape }}&amp;output=slide">Start Presentation</a>
-          </div>
-          <div class="btn-group dropdown">
-            <a class="btn dropdown-toggle" data-toggle="dropdown">
-              Share
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="#modal-addcollab" data-toggle="modal">Add collaborator</a>
-              <li><a id="button-unpublish" class="button-publish" href="javascript:slideSet.doPublish(false);" style="display:{% if slide_set.published %}block;{% else %}none;{% endif %}">Un-Publish</a>
-              <li><a id="button-publish"   class="button-publish" href="#modal-publish" data-toggle="modal" style="display:{% if slide_set.published %}none;{% else %}block;{% endif %}">Publish</a>
-            </ul>
-          </div>
+          <a class="btn" target="_blank" href="{{ request.uri|escape }}&amp;output=slide">View Presentation</a>
+          <a id="publish-button" class="btn">Publish</a>
           &nbsp; &nbsp; &nbsp; &nbsp; 
         </div>
       </div>
@@ -48,17 +36,13 @@
 
   <div class="subnav subnav-fixed subnav-background" style="top: 90px; padding-top:5px; padding-left: 20px; z-index: 1010;">
     <div class="pull-left">
-      <span id="slide-set-count" class="count"> slide(s)</span>
+      <span id="slide-set-count" class="count"></span>
 
       <a id="new-slide-button" class="btn" type="button" data-toggle="modal"/><i class="icon-plus"></i></a>
       <a id="delete-slide-button" class="btn" type="button"/>
       <i class="icon-remove"></i></a>
     </div>
 
-    <div class="pull-right">
-      <a class="btn" type="button" href="#modal-changetheme" data-toggle="modal">Change Theme</a>
-      &nbsp; &nbsp; &nbsp; &nbsp; 
-    </div>
   </div>
 
   <div class="container-fluid" style="padding-top: 100px;">
@@ -128,23 +112,6 @@
       </div>
       <div class="modal-footer">
           <button class="btn btn-primary" type="submit" onclick="slideSet.doPublish(true)" data-dismiss="modal">Yes, Publish!</button>
-          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="modal" id="modal-changetheme" style="display:none">
-    <div class="modal-header">
-      <button class="close" data-dismiss="modal">×</button>
-      <h3>Change Theme</h3>
-    </div>
-      <div class="modal-body">
-        <input type="image" style="width:80px;height:60px" src="/editor/img/theme_normal.png"  onclick="slideSet.changeTheme('normal');" data-dismiss="modal">
-        <input type="image" style="width:80px;height:60px" src="/editor/img/theme_ballerina.png" onclick="slideSet.changeTheme('ballerina'); " data-dismiss="modal">
-        <input type="image" style="width:80px;height:60px" src="/editor/img/theme_android.png"  onclick= "slideSet.changeTheme('android');" data-dismiss="modal">
-        <input type="image" style="width:80px;height:60px" src="/editor/img/theme_party.png"  onclick= "slideSet.changeTheme('party');" data-dismiss="modal">
-      </div>
-      <div class="modal-footer">
           <button class="btn" type="button" data-dismiss="modal">Cancel</button>
       </div>
     </form>

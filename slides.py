@@ -55,8 +55,6 @@ class SlideSet(db.Model):
   created    = db.DateTimeProperty(auto_now_add=True)
   updated    = db.DateTimeProperty(auto_now=True)
   published  = db.BooleanProperty(default=False)
-  theme      = db.StringProperty()
-  flavor     = db.StringProperty()
   slide_ids  = db.ListProperty(int)
   creator     = db.UserProperty()
 
@@ -77,10 +75,8 @@ class SlideSet(db.Model):
 
   def to_dict(self, with_slides=False):
     self_dict = {'title':    self.title,
-                'theme':     self.theme,
                 'published': self.published,
-                'slideIds': self.slide_ids,
-                'flavor':    self.flavor}
+                'slideIds': self.slide_ids}
     if with_slides:
       slides_dict = []
       slides = self.get_slides()
@@ -259,8 +255,16 @@ class SlideSetEditPage(BaseRequestHandler):
 
 class APIHandler(webapp.RequestHandler):
 
+  body_json = None
+
   def get_body(self):
-    return simplejson.loads(self.request.body)
+    if self.body_json is None:
+      self.body_json = simplejson.loads(self.request.body)
+    return self.body_json
+
+  def get_from_body(self, key):
+    body_json = self.get_body()
+    return body_json.get(key)
 
   def get_slide(self, slide_id):
     return Slide.get_by_id(int(slide_id))
@@ -323,19 +327,14 @@ class SlideSetAPI(APIHandler):
   def put(self, slide_set_id):
     slide_set    = SlideSet.get_by_id(int(slide_set_id))
     body         = simplejson.loads(self.request.body)
-    title        = body['title']
-    published    = body['published']
-    flavor       = body['flavor']
-    theme        = body['theme']
-    slide_ids    = body['slide_ids']
+    logging.info(body)
+    title        = self.get_from_body('title')
+    published    = self.get_from_body('published')
+    slide_ids    = self.get_from_body('slide_ids')
     if title:
       slide_set.title     = title
     if published:
       slide_set.published = published
-    if flavor:
-      slide_set.flavor    = flavor
-    if theme:
-      slide_set.theme     = theme
     if slide_ids:
       slide_set.slide_ids = slide_ids
     slide_set.put()

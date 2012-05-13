@@ -140,13 +140,13 @@ var SlideSetView = Backbone.View.extend({
 
   events: {
     "click #new-slide-button":  "onNewSlideButton",
-    "click #delete-slide-button": "onDeleteSlideButton"
+    "click #delete-slide-button": "onDeleteSlideButton",
+    "click #publish-button": "onPublishButton"
   },
 
   initialize: function() {
     this.slideSet = new SlideSet({id: window.location.href.split('/')[5]});
 
-    // listen to add/reset for slide collection, instantiate slidethumbview and slideeditview
     this.slideSet.on('all reset', this.render, this);
     this.slideSet.slides.on('add remove', this.render, this);
     this.slideSet.slides.on('add', this.onNewSlide, this);
@@ -158,8 +158,16 @@ var SlideSetView = Backbone.View.extend({
 
   render: function() {
     $('#slide-set-title').html(this.slideSet.get('title'));
-    $('#slide-set-count').html(this.slideSet.slides.length);
+    var slideLabel = (this.slideSet.slides.length == 1) ? 'slide' : 'slides';
+    $('#slide-set-count').html(this.slideSet.slides.length + ' ' + slideLabel);
+    var publishLabel = this.slideSet.get('published') ? 'Un-Publish' : 'Publish';
+    $('#publish-button').html(publishLabel);
     return this;
+  },
+
+  onPublishButton: function() {
+    this.slideSet.set({published: true});
+    this.slideSet.save();
   },
 
   onNewSlideButton: function() {

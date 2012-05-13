@@ -46,13 +46,18 @@ var SlideCollection = Backbone.Collection.extend({
 
 var SlideSet = Backbone.Model.extend({
 
-  // Default attributes for the todo item.
+  /*
+   id
+   title
+   slides
+   slideIds
+   format
+   theme
+   published
+   */
   defaults: function() {
     return {
-      id: null,
-      title: '',
-      theme: null,
-      slides: []
+      title: 'Untitled'
     };
   },
 
