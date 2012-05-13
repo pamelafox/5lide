@@ -1,89 +1,48 @@
 {% extends "base.html" %}
 
-{% block head %}
-  <script>
-  function selectLists(all) {
-    var inputs = document.getElementsByTagName("input");
-    for (var i = 0; i < inputs.length; i++) {
-      var input = inputs[i];
-      if (input.type == "checkbox" && input.className == "setcheckbox") {
-        var id = input.id.substring(8);
-        var row = document.getElementById("row" + id);
-        input.checked = all;
-        updateHighlight(input, row);
-      }
-    }
-  }
-
-  function updateHighlight(checkbox, row) {
-    if (checkbox.checked) {
-      row.style.backgroundColor = "#ffffcc";
-    } else {
-      row.style.backgroundColor = "white";
-    }
-  }
-  </script>
-{% endblock %}
-
 {% block body %}
-  <form action="/inboxaction.do" method="post">
 
-      <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
+<div id="inbox">
 
-      <div style="padding-top:20px; padding-left: 10px; padding-right: 10px;">
-        <button class="btn btn-primary" data-toggle="modal" href="#modal-newset">Create</button>
-        <button class="btn" data-toggle="modal" href="#modal-importset">Import</button>
+  <div style="padding-top:20px; padding-left: 10px; padding-right: 10px;">
+    <button class="btn btn-primary" data-toggle="modal" href="#modal-newset">Create</button>
+    <button class="btn" data-toggle="modal" href="#modal-importset">Import</button>
+  </div>
 
-        <div class="pull-right" style="display:none">
-          <button class="btn" type="submit" name="action" onclick="return confirm('Are you sure you want to permanently delete the selected slide sets?')"/>Delete</button>
-        </div>
-      </div>
+  <div style="border-bottom: 1px solid #ccc;">&nbsp;</div>
 
-      <div style="border-bottom: 1px solid #ccc;">&nbsp;</div>
-
-      <div class="table">
-        {% if sets %}
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="checkbox"><input type="checkbox" style="margin-left:0px;" onclick="selectLists(this.checked)"/></th>
-              <th>Slide Sets</th>
-              <th>Collaborators</th>
-              <th>Last Edited</th>
-            </tr>
-          <tbody>
-          </tr>
-          {% for set in sets %}
-            <tr id="row{{ forloop.counter }}">
-              <td class="checkbox"><input class="setcheckbox" style="margin-left:0px;" type="checkbox" name="set" value="{{ set.key }}" id="checkbox{{ forloop.counter }}" onclick="updateHighlight(this, document.getElementById('row{{ forloop.counter }}'))"/></td>
-              <td class="main">
-                <div class="name"><a {% if not set.archived %}class="active"{%endif %} href="/set?id={{ set.key.id }}">{{ set.title|escape }}</a></div>
-              </td>
-              <td class="members">
-                {% for member in set.slidesetmember_set %}
-                  {% ifequal member.user.email user.email %}
-                    Me
-                  {% else %}
-                    {{ member.user.nickname }}
-                  {% endifequal %}
-                  {% if not forloop.last %}/{% endif %}
-                {% endfor %}
-              </td>
-              <td class="date">
-                {{ set.updated|date:"D, M j, Y \a\t P" }}
-              </td>
-            </tr>
-          {% endfor %}
-        </table>
-        {% else %}
-        <div class="alert alert-block alert-info" style="margin: auto; width: 70%; margin-top: 60px;">
-          <h4 class="alert-heading">Welcome!</h4>
-          You don't have any slide sets. To get started, <a data-toggle="modal" href="#modal-newset">create a new set</a>.
-        </div>
-        {% endif %}
-      </div>
-
-  </form>
+  <div>
+    {% raw %}
+    <script id="inbox-template" type="text/x-handlebars-template">
+    {{#if slidesets}}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Last Edited</th>
+        </tr>
+      <tbody>
+      </tr>
+      {{#each slidesets}}
+        <tr>
+          <td>
+            <div><a class="active" href="/set?id={{id}}">{{title}}</a></div>
+          </td>
+          <td class="date">
+           {{updated}}
+          </td>
+        </tr>
+      {{/each}}
+    </table>
+    {{else}}
+    <div class="alert alert-block alert-info" style="margin: auto; width: 70%; margin-top: 60px;">
+      <h4 class="alert-heading">Welcome!</h4>
+      You have no slide sets :( To get started, <a data-toggle="modal" href="#modal-newset">create a new set</a>.
+    </div>
+    {{/if}}
+    </script>
+    {% endraw %}
+  </div>
 
   <div class="modal" id="modal-newset" style="display:none">
     <div class="modal-header">
@@ -127,5 +86,7 @@
       </div>
     </form>
   </div>
+
+</div>
 
 {% endblock %}

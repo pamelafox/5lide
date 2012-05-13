@@ -26,15 +26,13 @@ import sys
 import logging
 import re
 
+import webapp2
+
+from webapp2_extras.appengine.users import login_required
+from webapp2_extras import jinja2
 from google.appengine.api import users
 from google.appengine.ext import db
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp.util import login_required
-from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
-
-from django.utils import simplejson
 
 # Set to true if we want to have our webapp print stack traces, etc
 _DEBUG = True
@@ -87,7 +85,7 @@ class SlideSet(db.Model):
     return self_dict
 
   def to_json(self, with_slides=False):
-    return simplejson.dumps(self.to_dict(with_slides=with_slides))
+    return json.dumps(self.to_dict(with_slides=with_slides))
 
   def current_user_has_access(self):
     return self.user_has_access(users.get_current_user())
@@ -124,18 +122,23 @@ class Slide(db.Model):
             'content':   self.content}
 
   def to_json(self):
-    return simplejson.dumps(self.to_dict())
+    return json.dumps(self.to_dict())
 
 
-class BaseRequestHandler(webapp.RequestHandler):
+class BaseRequestHandler(webapp2.RequestHandler):
   """Supplies a common template generation function.
 
   When you call generate(), we augment the template variables supplied with
   the current user in the 'user' variable and the current webapp request
   in the 'request' variable.
   """
+
+  @webapp2.cached_property
+  def jinja2(self):
+        return jinja2.get_jinja2(app=self.app)
+
   def generate(self, template_name, template_values={}):
-    self.response.out.write(self.get_html(template_name, template_values))
+    self.response.write(self.get_html(template_name, template_values))
     
   def get_html(self, template_name, template_values={}):
     values = {
@@ -147,9 +150,7 @@ class BaseRequestHandler(webapp.RequestHandler):
         'debug': is_devserver(),
         }
     values.update(template_values)
-    directory = os.path.dirname(__file__)
-    path = os.path.join(directory, os.path.join('templates', template_name)) 
-    return template.render(path, values)
+    return self.jinja2.render_template(template_name, **values)
     
 
 class InboxPage(BaseRequestHandler):
@@ -250,13 +251,13 @@ class SlideSetEditPage(BaseRequestHandler):
     self.generate(template_name, template_values)
 
 
-class APIHandler(webapp.RequestHandler):
+class APIHandler(webapp2.RequestHandler):
 
   body_json = None
 
   def get_body(self):
     if self.body_json is None:
-      self.body_json = simplejson.loads(self.request.body)
+      self.body_json = json.loads(self.request.body)
     return self.body_json
 
   def get_from_body(self, key):
@@ -280,12 +281,12 @@ class SlideAPI(APIHandler):
     slide.put()
     slide_set.slide_ids.append(slide.key().id())
     slide_set.put()
-    self.response.out.write(slide.to_json())
+    self.response.write(slide.to_json())
 
   def get(self, slide_set_id, slide_id):
     slide = self.get_slide(slide_id)
     self.response.headers['Content-Type'] = 'application/json'
-    self.response.out.write(slide.to_json())
+    self.response.write(slide.to_json())
   
   def put(self, slide_set_id, slide_id):
     body         = self.get_body()
@@ -293,7 +294,7 @@ class SlideAPI(APIHandler):
     slide = self.get_slide(slide_id)
     slide.content = content
     slide.put()
-    self.response.out.write(slide.to_json())
+    self.response.write(slide.to_json())
 
   def delete(self, slide_set_id, slide_id):
     slide_set    = self.get_slide_set(slide_set_id)
@@ -314,16 +315,16 @@ class SlideSetAPI(APIHandler):
     slide_set.put()
     slide_set_member = SlideSetAuthor(slide_set=slide_set, user=user)
     slide_set_member.put()
-    self.response.out.write(slide_set.to_json(with_slides=True))
+    self.response.write(slide_set.to_json(with_slides=True))
 
   def get(self, slide_set_id):
     slide_set    = SlideSet.get_by_id(int(slide_set_id))
     self.response.headers['Content-Type'] = 'application/json'
-    self.response.out.write(slide_set.to_json(with_slides=True))
+    self.response.write(slide_set.to_json(with_slides=True))
   
   def put(self, slide_set_id):
     slide_set    = SlideSet.get_by_id(int(slide_set_id))
-    body         = simplejson.loads(self.request.body)
+    body         = json.loads(self.request.body)
     logging.info(body)
     title        = self.get_from_body('title')
     published    = self.get_from_body('published')
@@ -335,14 +336,13 @@ class SlideSetAPI(APIHandler):
     if slide_ids:
       slide_set.slide_ids = slide_ids
     slide_set.put()
-    self.response.out.write(slide_set.to_json(with_slides=True))
+    self.response.write(slide_set.to_json(with_slides=True))
 
   def delete(self, slide_set_id):
     slide_set    = SlideSet.get_by_id(int(slide_set_id))
     slide_set.delete()
 
-def main():
-  application = webapp.WSGIApplication([
+app = webapp2.WSGIApplication([
       ('/', InboxPage),
       ('/edit/set/(.*)',           SlideSetEditPage),
       ('/view/set/(.*)',           SlideSetViewPage),
@@ -351,7 +351,6 @@ def main():
       ('/api/sets/(.*)',             SlideSetAPI),
       ('/api/sets',                  SlideSetAPI),
       ], debug=_DEBUG)
-  run_wsgi_app(application)
 
 
 if __name__ == '__main__':

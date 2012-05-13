@@ -48,13 +48,13 @@ var SlideView = Backbone.View.extend({
 var SlideThumbView = Backbone.View.extend({
   tagName:  'li',
   className: 'slide-thumb',
-  template: _.template($('#slide-thumb-template').html()),
 
   events: {
     'click'   : 'onThumbClick',
   },
 
   initialize: function() {
+    this.template = Handlebars.compile($('#slide-edit-template').html());
     this.model.on('change', this.updateView, this);
   },
 
@@ -77,13 +77,13 @@ var SlideThumbView = Backbone.View.extend({
 
 var SlideEditView = Backbone.View.extend({
   tagName:  'div',
-  template: _.template($('#slide-edit-template').html()),
 
   events: {
     'keyup textarea'     :'onKeyUp'
   },
 
   initialize: function() {
+    this.template = Handlebars.compile($('#slide-edit-template').html());
     this.model.bind('change', this.updateView, this);
   },
 
