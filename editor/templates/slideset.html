@@ -1,9 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ slide_set.name|escape }} - 5lide{% endblock %}
+{% block title %}{{ slide_set.title|escape }} - 5lide{% endblock %}
 {% block head %}
-  {% if slide_set.published %}
-    <link rel="alternate" type="application/atom+xml" title="{{ slide_set.name|escape }}" href="{{ request.path }}?id={{ slide_set.key|stringformat:"s"|urlencode }}&amp;output=atom"/>
-  {% endif %}
   <style type="text/css">
   .slide-thumb {
     cursor: pointer;
@@ -25,14 +22,12 @@
 
       <div class="pull-right">
         <div class="btn-toolbar">
-          <a class="btn" target="_blank" href="{{ request.uri|escape }}&amp;output=slide">View Presentation</a>
+          <a class="btn" target="_blank" href="{{ slide_set.key().id() }}&amp;output=slide">View Presentation</a>
           <a id="publish-button" class="btn">Publish</a>
           &nbsp; &nbsp; &nbsp; &nbsp; 
         </div>
       </div>
    </div>
-
-   <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
 
   <div class="subnav subnav-fixed subnav-background" style="top: 90px; padding-top:5px; padding-left: 20px; z-index: 1010;">
     <div class="pull-left">
@@ -54,9 +49,11 @@
               <div id="container" style="overflow-y: auto; height: 643px; " ;="">
                 <ol id="slide-thumbs" style="position: relative; ">
 
+                  {% raw %}
                   <script type="text/template" id="slide-thumb-template">
-                    <%= title %>
+                    {{title}}
                   </script>
+                  {% endraw %}
 
                 </div>
               </div>
@@ -66,9 +63,11 @@
               <div id="slide-edit-area">
               </div>
 
+              {% raw %}
               <script type="text/template" id="slide-edit-template">
-              <textarea class="slide-edit-textarea" style="width: 100%; height: 150px;"><%= content %></textarea>
+              <textarea class="slide-edit-textarea" style="width: 100%; height: 150px;">{{content}}</textarea>
               </script>
+              {% endraw %}
 
               <div id="slide-preview-area">
                 <iframe id="slide-preview-iframe" style="width: 100%; height:450px;" frameborder="0"></iframe>
@@ -81,26 +80,6 @@
   </div>
 
   </form>
-
-
-  <div class="modal" id="modal-addcollab" style="display:none">
-    <div class="modal-header">
-      <button class="close" data-dismiss="modal">×</button>
-      <h3>New Collaborator</h3>
-    </div>
-    <form class="modal-form form-inline" action="/addmember.do" method="post" id="memberform">
-      <div class="modal-body">
-          <input type="hidden" name="next" value="{{ request.uri|escape }}"/>
-          <input type="hidden" name="set" value="{{ slide_set.key }}"/>
-          <label>Username: <input name="email" type="text" size="10"/></label>
-
-      </div>
-      <div class="modal-footer">
-          <button class="btn btn-primary" type="submit">Add Collaborator</button>
-          <button class="btn" type="button" data-dismiss="modal">Cancel</button>
-      </div>
-    </form>
-  </div>
 
   <div class="modal" id="modal-publish" style="display:none">
     <div class="modal-header">
@@ -120,7 +99,7 @@
 {% endblock %}
 
 {% block bottomscript %}
-<script src="/src/js/app/views.js" type="text/javascript"></script>
+<script src="/src/js/app/views-slideset.js" type="text/javascript"></script>
 {% endblock %}
 
 {% block readyscript %}

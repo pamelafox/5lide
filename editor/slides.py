@@ -25,6 +25,7 @@ import string
 import sys
 import logging
 import re
+import json
 
 import webapp2
 
@@ -39,6 +40,21 @@ _DEBUG = True
 
 def is_devserver():
     return os.environ['SERVER_SOFTWARE'].startswith('Dev')
+
+# Returns unix time stamp
+def datetime_to_timestamp(datetime):
+    import calendar
+    if datetime:
+        return calendar.timegm(datetime.utctimetuple())
+    else:
+        return None
+
+def datetime_to_iso(date):
+    if date:
+        return date.isoformat()
+    else:
+        return None
+
 
 class SlideSet(db.Model):
   """A SlideSet is that encompasses all the slides.
@@ -69,7 +85,10 @@ class SlideSet(db.Model):
       return False
 
   def to_dict(self, with_slides=False):
-    self_dict = {'title':    self.title,
+    self_dict = {'id':      self.key().id(),
+                 'created': datetime_to_timestamp(self.created),
+                 'updated': datetime_to_timestamp(self.updated),
+                'title':    self.title,
                 'published': self.published,
                 'slideIds': self.slide_ids}
     if with_slides:
@@ -155,11 +174,10 @@ class BaseRequestHandler(webapp2.RequestHandler):
 
 class InboxPage(BaseRequestHandler):
   """Lists all the slide sets for the current user."""
+
   @login_required
   def get(self):
-    sets = SlideSet.get_current_user_sets()
-    self.generate('index.html', {
-        'sets': sets})
+    self.generate('inbox.html', {})
 
 
 class SlideSetViewPage(BaseRequestHandler):
@@ -175,8 +193,7 @@ class SlideSetViewPage(BaseRequestHandler):
   # template file extensions
   _OUTPUT_TYPES = {
     'pdf': ['application/pdf', 'slide', 'html'],
-    'slide': ['text/html', 'slide', 'html'],
-    'atom': ['application/atom+xml', 'atom', 'xml'],}
+    'slide': ['text/html', 'slide', 'html']}
 
   def get(self):
     slide_set = SlideSet.get_by_id(int(self.request.get('id')))
@@ -241,7 +258,7 @@ class SlideSetEditPage(BaseRequestHandler):
           self.redirect(users.create_login_url(self.request.uri))
         return
 
-    template_name = 'slideset_edit.html'
+    template_name = 'slideset.html'
     template_values = {
         'can_edit': can_edit,
         'slide_set': slide_set
@@ -272,6 +289,17 @@ class APIHandler(webapp2.RequestHandler):
 
   def write_error(self, error):
     return '{"status": "error"}'
+
+
+class InboxAPI(APIHandler):
+
+  def get(self):
+    slide_sets = []
+    for slide_set in  SlideSet.get_current_user_sets():
+      slide_sets.append(slide_set.to_dict(with_slides=False))
+    response = {'slidesets': slide_sets}
+    self.response.out.write(json.dumps(response))
+
 
 class SlideAPI(APIHandler):
 
@@ -313,8 +341,6 @@ class SlideSetAPI(APIHandler):
       return
     slide_set = SlideSet(title=title, creator=user)
     slide_set.put()
-    slide_set_member = SlideSetAuthor(slide_set=slide_set, user=user)
-    slide_set_member.put()
     self.response.write(slide_set.to_json(with_slides=True))
 
   def get(self, slide_set_id):
@@ -343,12 +369,13 @@ class SlideSetAPI(APIHandler):
     slide_set.delete()
 
 app = webapp2.WSGIApplication([
-      ('/', InboxPage),
-      ('/edit/set/(.*)',           SlideSetEditPage),
-      ('/view/set/(.*)',           SlideSetViewPage),
-      ('/api/sets/(.*)/slides/(.*)', SlideAPI),
-      ('/api/sets/(.*)/slides',      SlideAPI),
-      ('/api/sets/(.*)',             SlideSetAPI),
+      ('/',                          InboxPage),
+      (r'/edit/set/(.*)',             SlideSetEditPage),
+      (r'/view/set/(.*)',             SlideSetViewPage),
+      ('/api/inbox',                 InboxAPI),
+      (r'/api/sets/(.*)/slides/(.*)', SlideAPI),
+      (r'/api/sets/(.*)/slides',      SlideAPI),
+      (r'/api/sets/(.*)',             SlideSetAPI),
       ('/api/sets',                  SlideSetAPI),
       ], debug=_DEBUG)
 

@@ -8,5 +8,5 @@ handlers:
   static_files: favicon.ico
   upload: favicon.ico
 
-- url: .*
-  script: slides.py
+- url: /fathomjs
+  static_dir: fathomjs

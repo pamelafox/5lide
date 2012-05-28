@@ -35,11 +35,11 @@ var Slide = Backbone.Model.extend({
     if (!autoTitle) {
       autoTitle = 'Untitled';
     }
+    console.log(autoTitle);
     this.set({'title': autoTitle});
   }
 });
 
-// its more backboey to fetch on collections
 var SlideCollection = Backbone.Collection.extend({
   model: Slide
 });
@@ -54,6 +54,7 @@ var SlideSet = Backbone.Model.extend({
    format
    theme
    published
+   updated
    */
   defaults: function() {
     return {
@@ -62,11 +63,10 @@ var SlideSet = Backbone.Model.extend({
   },
 
   url : function() {
-    // Change to more RESTful later
     if (this.id) {
       return '/api/sets/' + this.id;
     } else {
-      return '/api/sets/';
+      return '/api/sets';
     }
   },
  
@@ -78,6 +78,28 @@ var SlideSet = Backbone.Model.extend({
   parse: function(resp) {
     this.slides.reset(resp.slides);
     delete resp.slides;
+    return resp;
+  }
+
+});
+
+var SlideSetCollection = Backbone.Collection.extend({
+  model: SlideSet
+});
+
+var Inbox = Backbone.Model.extend({
+
+  url: function() {
+    return '/api/inbox';
+  },
+
+  initialize: function() {
+    this.slidesets = new SlideSetCollection();
+  },
+
+  parse: function(resp) {
+    this.slidesets.reset(resp.slidesets);
+    delete resp.slidesets;
     return resp;
   }
 

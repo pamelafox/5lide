@@ -1,0 +1,1482 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"EVENT_",
+				"EVENT_SLIDE_SELECTED"
+			],
+			[
+				"content",
+				"content"
+			],
+			[
+				"show",
+				"show"
+			],
+			[
+				"get_pytz",
+				"get_pytz_timezone_for_user_dict"
+			],
+			[
+				"convert",
+				"convertImgToDataURI"
+			],
+			[
+				"id",
+				"id"
+			],
+			[
+				"observ",
+				"observableArray"
+			],
+			[
+				"KEY_US",
+				"KEY_USERS_CURSOR"
+			],
+			[
+				"cho",
+				"choose_tip_for_today"
+			],
+			[
+				"verify",
+				"verify_ready"
+			],
+			[
+				"__",
+				"__class__"
+			],
+			[
+				"text",
+				"enter_text_field"
+			],
+			[
+				"hide",
+				"hide"
+			],
+			[
+				"SHA",
+				"SHARE_ME"
+			],
+			[
+				"data_",
+				"data_settings_page"
+			],
+			[
+				"MEA",
+				"MEASUREMENT_BODYFAT"
+			],
+			[
+				"get_m",
+				"get_measurement_units"
+			],
+			[
+				"COLUMN",
+				"COLUMN_BODYFAT"
+			],
+			[
+				"row",
+				"row"
+			],
+			[
+				"COL",
+				"COLUMN_BODYFAT"
+			],
+			[
+				"CSV",
+				"CSVLINK"
+			],
+			[
+				"SHARED",
+				"SHARE_WORLD"
+			],
+			[
+				"KEY_WORLD",
+				"KEY_WORLDLOGS_TS"
+			],
+			[
+				"habits",
+				"habits"
+			],
+			[
+				"ids",
+				"ids"
+			],
+			[
+				"STATUS",
+				"STATUS_LEGACY"
+			],
+			[
+				"level",
+				"level"
+			],
+			[
+				"n",
+				"n"
+			],
+			[
+				"CURR",
+				"CURRENT_USER"
+			],
+			[
+				"NEWPASSWORD",
+				"NEWPASSWORD1"
+			],
+			[
+				"get_",
+				"get_attribute"
+			],
+			[
+				"True",
+				"True"
+			],
+			[
+				"goals",
+				"goals_settings_page"
+			],
+			[
+				"goals_",
+				"goals_settings_page"
+			],
+			[
+				"profi",
+				"profile_settings_page"
+			],
+			[
+				"profile",
+				"profile_settings_page"
+			],
+			[
+				"info",
+				"info"
+			],
+			[
+				"False",
+				"False"
+			],
+			[
+				"api",
+				"apiproxy_errors"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "editor/slides.py",
+			"settings":
+			{
+				"buffer_size": 11465,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/templates/base.html",
+			"settings":
+			{
+				"buffer_size": 2836,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/src/js/app/views-inbox.js",
+			"settings":
+			{
+				"buffer_size": 732,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/src/js/libs/timeago.js",
+			"settings":
+			{
+				"buffer_size": 3864,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/src/js/app/views-slideset.js",
+			"settings":
+			{
+				"buffer_size": 5200,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/src/js/app/models.js",
+			"settings":
+			{
+				"buffer_size": 1909,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/templates/slideset.html",
+			"settings":
+			{
+				"buffer_size": 3484,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "editor/src/css/less/base.less",
+			"settings":
+			{
+				"buffer_size": 1663,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 267.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Disable Package"
+			],
+			[
+				"Pack",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 449.0
+	},
+	"console":
+	{
+		"height": 51.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": true,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/pamelafox/Desktop/allaboutcats.html",
+		"/Users/pamelafox/5lide/editor/templates/inbox.html",
+		"/Users/pamelafox/5lide/editor/templates/slideset_atom.xml",
+		"/Users/pamelafox/5lide/editor/templates/slideset_edit.html",
+		"/Users/pamelafox/5lide/editor/templates/index.html",
+		"/Users/pamelafox/5lide/editor/app.yaml",
+		"/Users/pamelafox/5lide/editor/src/js/libs/handlebars.js",
+		"/Users/pamelafox/5lide/editor/src/js/app/views.js",
+		"/Users/pamelafox/5lide/slides.py",
+		"/Users/pamelafox/5lide/editor/src/js/libs/zepto-mods.js",
+		"/Users/pamelafox/5lide/templates/base.html",
+		"/Users/pamelafox/5lide/editor/src/js/app/models.js",
+		"/Users/pamelafox/5lide/templates/slideset_edit.html",
+		"/Users/pamelafox/5lide/editor/src/js/libs/backbone.js",
+		"/Users/pamelafox/5lide/templates/index.html",
+		"/Users/pamelafox/5lide/editor/src/js/app/slidesedit.js",
+		"/Users/pamelafox/Dropbox/Public/javascript/exercises/ifelse.html",
+		"/Users/pamelafox/5lide/editor/src/js/libs/underscore.js",
+		"/Users/pamelafox/5lide/editor/src/js/app/reqs.js",
+		"/Users/pamelafox/5lide/app.yaml",
+		"/Users/pamelafox/5lide/editor/grunt.js",
+		"/Users/pamelafox/5lide/editor/src/js/libs/zepto.js",
+		"/Users/pamelafox/5lide/editor/src/js/libs/zepto-data.js",
+		"/Users/pamelafox/5lide/templates/slideset_slide.html",
+		"/Users/pamelafox/5lide/editor/src/css/less/base.less",
+		"/Users/pamelafox/5lide/viewer/grunt.js",
+		"/Users/pamelafox/5lide/editor/src/css/app/slide.css",
+		"/Users/pamelafox/5lide/grunt.js",
+		"/Users/pamelafox/5lide/static/src/css/app/slide.css",
+		"/Users/pamelafox/5lide/static/src/css/less/base.less",
+		"/Users/pamelafox/5lide/static/src/css/app/theme_party.css",
+		"/Users/pamelafox/5lide/static/css/base.less",
+		"/Users/pamelafox/5lide/static/src/js/app/reqs.js",
+		"/Users/pamelafox/5lide/static/javascript/bootstrap.js",
+		"/Users/pamelafox/5lide/pdfcred.py",
+		"/Users/pamelafox/5lide/static/css/bootstrap-responsive.css",
+		"/Users/pamelafox/5lide/static/javascript/jeesh.js",
+		"/Users/pamelafox/5lide/static/css/base.less.css",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/log-measurements-tmpl.handlebars",
+		"/Users/pamelafox/Dropbox/everyday/application/static/sass/_common.scss",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_log_measurements.html",
+		"/Users/pamelafox/Dropbox/everyday/android/assets/www/index.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/base.html",
+		"/Users/pamelafox/Dropbox/everyday/Makefile",
+		"/Users/pamelafox/Dropbox/everyday/tests/mobile_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/tests/mobile_page.py",
+		"/Users/pamelafox/Dropbox/everyday/android/AndroidManifest.xml",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/mobile.js",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_log_notes.html",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/web.js",
+		"/Users/pamelafox/Dropbox/everyday/tests/selenium_page.py",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/phonegap-mock.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/util.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/shared.js",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/phonegap/index.html",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/phonegap-1.2.0.js",
+		"/Users/pamelafox/Dropbox/everyday/android/assets/www/js/libs/phonegap-1.2.0.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/sass/phonegap.scss",
+		"/Users/pamelafox/Dropbox/everyday/iphone_release.py",
+		"/Users/pamelafox/Dropbox/everyday/android_release.py",
+		"/Users/pamelafox/Dropbox/everyday/android/src/io/everyday/app/App.java",
+		"/Users/pamelafox/Dropbox/everyday/tests/login_page.py",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/tips.js",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/tips_kitchen.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/tips_reading.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/tips_cookbooks.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/yourbase.html",
+		"/Users/pamelafox/Dropbox/everyday/application/views.py",
+		"/Users/pamelafox/Dropbox/everyday/application/urls.py",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/handlebars.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/models.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/date.format.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/timing.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/bootstrap.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/data.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/jquery.fancybox.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/phonegap.js",
+		"/Users/pamelafox/Dropbox/everyday/application/util.py",
+		"/Users/pamelafox/Dropbox/everyday/application/models.py",
+		"/Users/pamelafox/Dropbox/everyday/application/__init__.py",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson4/inclass.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson3/exercise_solution.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson4/exercise1_solution.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson4/exercise2_solution.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson5/exercise_layout_solution.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson1/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson2/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson3/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson4/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson5/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/lesson1/screenshot_viewsource.png",
+		"/Users/pamelafox/Dropbox/mixitkeynote/app.yaml",
+		"/Users/pamelafox/Dropbox/mixitkeynote/index.html",
+		"/Users/pamelafox/Dropbox/mixitkeynote/js/impress.js",
+		"/Users/pamelafox/Dropbox/mixitkeynote/js/globe.js",
+		"/Users/pamelafox/Dropbox/mixitkeynote/css/styles.css",
+		"/Users/pamelafox/Dropbox/mixitkeynote/css/stylesheet.css",
+		"/Users/pamelafox/Dropbox/mixitkeynote/css/impress-demo.css",
+		"/Users/pamelafox/Dropbox/mixitkeynote/js/tagcanvas.js",
+		"/Users/pamelafox/Dropbox/Public/htmlcss-1day/lesson3/slides.html",
+		"/Users/pamelafox/teaching-materials/htmlcss-1day/index.html",
+		"/Users/pamelafox/Dropbox/everyday/brokentests.txt",
+		"/Users/pamelafox/Dropbox/everyday/tests/sharing_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/tests/test_defaults.py",
+		"/Users/pamelafox/Dropbox/everyday/tests/start_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/libs/colorslider.js",
+		"/Users/pamelafox/Dropbox/everyday/tests/misc_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/application/static/sass/web.scss",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_stream.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/stream-comment-tmpl.handlebars",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/stream-log-tmpl.handlebars",
+		"/Users/pamelafox/Dropbox/everyday/tests/brokentests.txt",
+		"/Users/pamelafox/Dropbox/everyday/tests/settings_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_stats.html",
+		"/Users/pamelafox/Dropbox/everyday/tests/streak_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/tests/log_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/tests/stats_tests.py",
+		"/Users/pamelafox/Dropbox/everyday/android/src/com/borismus/WebIntent.java",
+		"/Users/pamelafox/Dropbox/everyday/android/assets/www/js/libs/phonegap-intent.js",
+		"/Users/pamelafox/Dropbox/everyday/application/static/js/phonegap-fb-android.js",
+		"/Users/pamelafox/Dropbox/everyday/android/src/com/hipsnip/plugins/facebook/FacebookAuth.java",
+		"/Users/pamelafox/Dropbox/everyday/android/res/xml/plugins.xml",
+		"/Users/pamelafox/Documents/eclipse-workspace/PhoneGap/src/com/phonegap/api/PluginResult.java",
+		"/Users/pamelafox/Documents/eclipse-workspace/PhoneGap/src/com/phonegap/ExifHelper.java",
+		"/Users/pamelafox/Documents/eclipse-workspace/PhoneGap/src/com/phonegap/CameraLauncher.java",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/log-meal-tmpl.handlebars",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_log_foodgoals.html",
+		"/Users/pamelafox/Dropbox/everyday/application/templates/_log_meals.html"
+	],
+	"find":
+	{
+		"height": 39.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"console",
+			"template",
+			"<%",
+			"\\{\\{",
+			"{{",
+			"atom",
+			"atom'",
+			"atom",
+			"to_iso",
+			"distanceMillis",
+			"seconds",
+			"less than a",
+			"datetime_to",
+			"SlideSetAuthor",
+			"get_current_user_sets",
+			"jinja2",
+			"simplejson",
+			"out.w",
+			"template",
+			"set",
+			"remove_slide",
+			"get_slide_set",
+			"update",
+			"update()",
+			"SlideView",
+			"thumbclick",
+			"SlideView",
+			"fetch: ",
+			"console",
+			"get_body",
+			"undefined",
+			"current_user_has_acces",
+			"SlideSetAuthor",
+			"user_has_access",
+			"SlideSetUser",
+			"Member",
+			"SlideSet",
+			"creator",
+			"User",
+			"AddMem",
+			"EditSlideA",
+			"\\.slide",
+			".slide",
+			"slidelist",
+			"slide-edit-textarea",
+			"slide-edit-area",
+			"trigger",
+			"SlideThumbView",
+			"slidelist",
+			"to_json",
+			"SlideSetAction",
+			"slide_set",
+			"SlideSetPage",
+			"slides",
+			"new Slide",
+			"showSlide",
+			"fetch:",
+			"list",
+			"CreateSlideSetAction",
+			"_DEBUG",
+			"SlideSetPage",
+			"SlideSet =",
+			"container",
+			"slidelist",
+			"cleanUpEdit_",
+			"newSlide",
+			"parseLi",
+			"parseList",
+			"build",
+			"modal-changetheme",
+			"doPublish",
+			"newSlide",
+			"\\{\\{",
+			"{{",
+			"images",
+			"viewer",
+			"BaseRequestHandler",
+			"banner",
+			"CLICK",
+			"click",
+			"addcollab",
+			"doPublish",
+			"else",
+			"published",
+			"doPublish",
+			"Publish",
+			"console.log",
+			"clearMenus",
+			"toggleClass",
+			"dropdown",
+			"closeDialog",
+			"modal-newslide",
+			"showDialog",
+			"selectLists",
+			"body",
+			"corner",
+			"window.jQuery",
+			"Button",
+			"button",
+			"color",
+			"button",
+			"pdfcred",
+			"intent",
+			"log-error",
+			"hidden",
+			"val\\(",
+			"renderLog",
+			"clearOldData",
+			"getErrorMessage",
+			"log-error-message",
+			"addChangeHandler",
+			"change",
+			"click",
+			"checked",
+			"get_text",
+			"FETCHED_DATA",
+			"PhoneGap",
+			"addEventListener",
+			"resume",
+			"documentEventHandler",
+			"deviceready",
+			"Resume",
+			"onResume",
+			"fireWindowEvent",
+			"fireDocumentEvent",
+			"resume",
+			"maybeFetchStream",
+			"fetchStreamStatus"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+			"&gt;",
+			"&lt;",
+			"/",
+			"userLog\\.",
+			", \\nLOG ",
+			", LOG \\n",
+			"CURRENT_DATE",
+			"ED.CURRENT_LOG_DATE",
+			"LogForm",
+			"logForms",
+			"style=\"",
+			"class=\"",
+			"name=\"",
+			"value=\"",
+			"",
+			"text/html",
+			"{{",
+			"window.jQuery || window.Zepto",
+			"log_msgs\\.append\\(",
+			"log_msgs",
+			"\\},\\n\\{",
+			"},\\n{",
+			"helptext':",
+			"'helptext':",
+			"'unitsId':",
+			"'label':",
+			"&gt;",
+			"&lt;",
+			"&gt;",
+			"&lt;",
+			"&gt;",
+			"&lt;",
+			"\"step slide\"",
+			"",
+			"recent_streak",
+			"recent_food_streak",
+			"recent_body_streak",
+			"recent_log_streak",
+			"&gt;",
+			"&lt;",
+			"title=",
+			"page-section",
+			"form-horizontal",
+			"alert alert-info ",
+			"btn-large",
+			"btn-primary",
+			"btn-small",
+			"alert-block",
+			"alert",
+			"data-original-title",
+			"start-progress",
+			"render_controlgroup",
+			"render_controls",
+			"+\\n",
+			"\\n",
+			"util.render_template",
+			"maxWidth",
+			"maxHeight",
+			"request.values",
+			"values.get",
+			"cache_key",
+			"ED.CURRENT_USER",
+			"enableElement",
+			"ED.CURRENT_USER",
+			"data-",
+			"FETCHING_PHOTO",
+			"CURRENT_DATE",
+			"\\n ",
+			"setup",
+			"WithingsClient\\.",
+			"\\n LOG",
+			"\\n\\n",
+			"logInfo",
+			"",
+			"{{=",
+			"{{=id}}",
+			"text-cell",
+			"",
+			"RPC_URL",
+			"logError",
+			"",
+			"top",
+			"LS_USER",
+			"renderUserData",
+			"logpages",
+			"pages",
+			"logsections",
+			"pages",
+			"var",
+			"']) {",
+			"ED.util.trackEvent",
+			"button",
+			"  };",
+			" = '';",
+			" && ",
+			";').",
+			";",
+			"ED.data.goals",
+			"ED.data.goalsList",
+			"ED.data.goals",
+			"ED.data.bonuses",
+			"ED.data.bonusesList",
+			"ED.data.foodtypesList",
+			"ED.data.foodtypes",
+			"ED.data.measurements",
+			"ED.data.units",
+			"ED.shared.formatMeasurement",
+			"ED.shared.convertMeasurement",
+			"ED.shared.getFormDate",
+			"ED.shared.renderErrors",
+			"ED.shared.setupFormSave",
+			"ED.shared.sendData",
+			"ED.models.Log(",
+			"ED.models.User(",
+			"ED.util.inView(",
+			"ED.util.getUrlParam(",
+			"ED.util.changePage(",
+			"ED.util.isAndroid(",
+			"ED.util.truncateText(",
+			"ED.util.linkifyText(",
+			"ED.util.toUnderscore(",
+			"ED.util.toCamelCase(",
+			"ED.util.values(",
+			"ED.util.keys(",
+			" ED.util.keys",
+			"ED.util.keys",
+			"ED.util.each",
+			"health"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "editor/slides.py",
+					"settings":
+					{
+						"buffer_size": 11465,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7865,
+								7865
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4050.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "editor/templates/base.html",
+					"settings":
+					{
+						"buffer_size": 2836,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								836,
+								836
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 93.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "editor/src/js/app/views-inbox.js",
+					"settings":
+					{
+						"buffer_size": 732,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								525,
+								525
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "editor/src/js/libs/timeago.js",
+					"settings":
+					{
+						"buffer_size": 3864,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								987,
+								987
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 21.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "editor/src/js/app/views-slideset.js",
+					"settings":
+					{
+						"buffer_size": 5200,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5119,
+								5119
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2575.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "editor/src/js/app/models.js",
+					"settings":
+					{
+						"buffer_size": 1909,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								879,
+								879
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "editor/templates/slideset.html",
+					"settings":
+					{
+						"buffer_size": 3484,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1843,
+								1843
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 583.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "editor/src/css/less/base.less",
+					"settings":
+					{
+						"buffer_size": 1663,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1540,
+								1540
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 178.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"models",
+				"editor/src/js/app/models.js"
+			],
+			[
+				"views",
+				"editor/src/js/app/views-slideset.js"
+			],
+			[
+				"slides.p",
+				"slides.py"
+			],
+			[
+				"backbone",
+				"editor/src/js/libs/backbone.js"
+			],
+			[
+				"back",
+				"editor/src/js/libs/backbone.js"
+			],
+			[
+				"slides_e",
+				"templates/slideset_edit.html"
+			],
+			[
+				"s",
+				"slides.py"
+			],
+			[
+				"slides.py",
+				"slides.py"
+			],
+			[
+				"zepto.",
+				"editor/src/js/libs/zepto.js"
+			],
+			[
+				"zepto",
+				"editor/src/js/libs/zepto-mods.js"
+			],
+			[
+				"zepto-mods",
+				"editor/src/js/libs/zepto-mods.js"
+			],
+			[
+				"base.",
+				"templates/base.html"
+			],
+			[
+				"ap",
+				"app.yaml"
+			],
+			[
+				"grunt.",
+				"grunt.js"
+			],
+			[
+				"bootstrap",
+				"static/javascript/bootstrap.js"
+			],
+			[
+				"bootstrap.js",
+				"static/javascript/bootstrap.js"
+			],
+			[
+				"log-m",
+				"application/templates/log-measurements-tmpl.handlebars"
+			],
+			[
+				"common",
+				"application/static/sass/_common.scss"
+			],
+			[
+				"index.h",
+				"android/assets/www/index.html"
+			],
+			[
+				"base",
+				"application/templates/base.html"
+			],
+			[
+				"makefi",
+				"Makefile"
+			],
+			[
+				"log-measure",
+				"application/templates/log-measurements-tmpl.handlebars"
+			],
+			[
+				"log_meas",
+				"application/templates/_log_measurements.html"
+			],
+			[
+				"makefil",
+				"Makefile"
+			],
+			[
+				"androidman",
+				"android/AndroidManifest.xml"
+			],
+			[
+				"_log_not",
+				"application/templates/_log_notes.html"
+			],
+			[
+				"shared",
+				"application/static/js/shared.js"
+			],
+			[
+				"_log_notes",
+				"application/templates/_log_notes.html"
+			],
+			[
+				"web.js",
+				"application/static/js/web.js"
+			],
+			[
+				"selenium",
+				"tests/selenium_page.py"
+			],
+			[
+				"mobile_page",
+				"tests/mobile_page.py"
+			],
+			[
+				"phonegap-mock",
+				"application/static/js/phonegap-mock.js"
+			],
+			[
+				"phonegap-1.2",
+				"application/static/js/libs/phonegap-1.2.0.js"
+			],
+			[
+				"util.js",
+				"application/static/js/util.js"
+			],
+			[
+				"shard",
+				"application/static/js/shared.js"
+			],
+			[
+				"index",
+				"application/templates/phonegap/index.html"
+			],
+			[
+				"phonegap.scs",
+				"application/static/sass/phonegap.scss"
+			],
+			[
+				"iphone_rel",
+				"iphone_release.py"
+			],
+			[
+				"android_re",
+				"android_release.py"
+			],
+			[
+				"mobile.js",
+				"application/static/js/mobile.js"
+			],
+			[
+				"seleniu",
+				"tests/selenium_page.py"
+			],
+			[
+				"login_page",
+				"tests/login_page.py"
+			],
+			[
+				"mobile_test",
+				"tests/mobile_tests.py"
+			],
+			[
+				"tips.js",
+				"application/static/js/tips.js"
+			],
+			[
+				"tips_kit",
+				"application/templates/tips_kitchen.html"
+			],
+			[
+				"tips_read",
+				"application/templates/tips_reading.html"
+			],
+			[
+				"tips_",
+				"application/templates/tips_kitchen.html"
+			],
+			[
+				"yourbase",
+				"application/templates/yourbase.html"
+			],
+			[
+				"cookbo",
+				"application/templates/tips_cookbooks.html"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"urls",
+				"application/urls.py"
+			],
+			[
+				"handlebars",
+				"application/static/js/libs/handlebars.js"
+			],
+			[
+				"models.js",
+				"application/static/js/models.js"
+			],
+			[
+				"date.for",
+				"application/static/js/libs/date.format.js"
+			],
+			[
+				"handlebars.js",
+				"application/static/js/libs/handlebars.js"
+			],
+			[
+				"fancybo",
+				"application/static/js/libs/jquery.fancybox.js"
+			],
+			[
+				"date.forma",
+				"application/static/js/libs/date.format.js"
+			],
+			[
+				"data.js",
+				"application/static/js/data.js"
+			],
+			[
+				"fancybox.js",
+				"application/static/js/libs/jquery.fancybox.js"
+			],
+			[
+				"phonegap.scss",
+				"application/static/sass/phonegap.scss"
+			],
+			[
+				"phonegap-1.",
+				"application/static/js/libs/phonegap-1.2.0.js"
+			],
+			[
+				"phonegap.",
+				"application/static/js/libs/phonegap.js"
+			],
+			[
+				"mobile",
+				"application/static/js/mobile.js"
+			],
+			[
+				"util",
+				"application/util.py"
+			],
+			[
+				"iphone_re",
+				"iphone_release.py"
+			],
+			[
+				"android_rel",
+				"android_release.py"
+			],
+			[
+				"__",
+				"application/__init__.py"
+			],
+			[
+				"style",
+				"common/styles.css"
+			],
+			[
+				"start_te",
+				"tests/start_tests.py"
+			],
+			[
+				"test_de",
+				"tests/test_defaults.py"
+			],
+			[
+				"sharing_t",
+				"tests/sharing_tests.py"
+			],
+			[
+				"",
+				"brokentests.txt"
+			],
+			[
+				"settings_te",
+				"tests/settings_tests.py"
+			],
+			[
+				"start_tes",
+				"tests/start_tests.py"
+			],
+			[
+				"start_t",
+				"tests/start_tests.py"
+			],
+			[
+				"stream-log",
+				"application/templates/stream-log-tmpl.handlebars"
+			],
+			[
+				"stream-comm",
+				"application/templates/stream-comment-tmpl.handlebars"
+			],
+			[
+				"_stream",
+				"application/templates/_stream.html"
+			],
+			[
+				"common.scss",
+				"application/static/sass/_common.scss"
+			],
+			[
+				"web.",
+				"application/static/sass/web.scss"
+			],
+			[
+				"util.py",
+				"application/util.py"
+			],
+			[
+				"misc_te",
+				"tests/misc_tests.py"
+			],
+			[
+				"_stats",
+				"application/templates/_stats.html"
+			],
+			[
+				"streak_t",
+				"tests/streak_tests.py"
+			],
+			[
+				"log_tes",
+				"tests/log_tests.py"
+			],
+			[
+				"stats_tes",
+				"tests/stats_tests.py"
+			],
+			[
+				"colorslider.js",
+				"application/static/js/libs/colorslider.js"
+			],
+			[
+				"phonegap-in",
+				"android/assets/www/js/libs/phonegap-intent.js"
+			],
+			[
+				"phonegap-fb-a",
+				"application/static/js/phonegap-fb-android.js"
+			],
+			[
+				"phonegap-12.",
+				"application/static/js/libs/phonegap-1.2.0.js"
+			],
+			[
+				"facebookau",
+				"android/src/com/hipsnip/plugins/facebook/FacebookAuth.java"
+			],
+			[
+				"phonegap-fb",
+				"application/static/js/phonegap-fb-android.js"
+			],
+			[
+				"facebookauth",
+				"android/src/com/hipsnip/plugins/facebook/FacebookAuth.java"
+			],
+			[
+				"webintent",
+				"android/src/com/borismus/WebIntent.java"
+			],
+			[
+				"plugin",
+				"android/res/xml/plugins.xml"
+			],
+			[
+				"phonegap-12",
+				"android/assets/www/js/libs/phonegap-1.2.0.js"
+			],
+			[
+				"phonegap-int",
+				"android/assets/www/js/libs/phonegap-intent.js"
+			],
+			[
+				"webin",
+				"android/src/com/borismus/WebIntent.java"
+			],
+			[
+				"makefile",
+				"Makefile"
+			],
+			[
+				"phonegap.js",
+				"application/static/js/libs/phonegap.js"
+			],
+			[
+				"log-mea",
+				"application/templates/log-meal-tmpl.handlebars"
+			],
+			[
+				"phonegap",
+				"application/static/sass/phonegap.scss"
+			],
+			[
+				"mobile.",
+				"application/static/js/mobile.js"
+			],
+			[
+				"log_food",
+				"application/templates/_log_foodgoals.html"
+			],
+			[
+				"mobile_tes",
+				"tests/mobile_tests.py"
+			],
+			[
+				"phonegap/ind",
+				"application/templates/phonegap/index.html"
+			],
+			[
+				"_log_mea",
+				"application/templates/_log_meals.html"
+			],
+			[
+				"phone",
+				"application/static/sass/phonegap.scss"
+			],
+			[
+				"web.css",
+				"application/static/css/web.css"
+			],
+			[
+				"color",
+				"application/static/css/colorslider.css"
+			],
+			[
+				"log-meal",
+				"application/templates/log-meal-tmpl.handlebars"
+			],
+			[
+				"commo",
+				"application/static/sass/_common.scss"
+			],
+			[
+				"android_",
+				"android_release.py"
+			],
+			[
+				"phonegap.css",
+				"application/static/css/phonegap.css"
+			],
+			[
+				"utils.js",
+				".build/jshint/tests/unit/fixtures/strict_violations.js"
+			],
+			[
+				"settings_t",
+				"tests/settings_tests.py"
+			],
+			[
+				"settings_tests",
+				"tests/settings_tests.py"
+			],
+			[
+				"profile_",
+				"tests/profile_settings_page.py"
+			],
+			[
+				"start_tests",
+				"tests/start_tests.py"
+			],
+			[
+				"stream-log-tm",
+				"application/templates/stream-log-tmpl.handlebars"
+			],
+			[
+				"app",
+				"app.yaml"
+			],
+			[
+				"common.css",
+				"application/static/sass/_common.scss"
+			],
+			[
+				"stream-log-",
+				"application/templates/stream-log-tmpl.handlebars"
+			],
+			[
+				"bind",
+				"packages/instagram/bind.py"
+			],
+			[
+				"util.p",
+				"application/util.py"
+			],
+			[
+				"util.",
+				"application/static/js/util.js"
+			],
+			[
+				"gae.",
+				"packages/pytz/gae.py"
+			],
+			[
+				"insta",
+				"packages/instagram/client.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 183.0,
+	"status_bar_visible": true
+}

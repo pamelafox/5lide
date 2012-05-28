@@ -54,7 +54,7 @@ var SlideThumbView = Backbone.View.extend({
   },
 
   initialize: function() {
-    this.template = Handlebars.compile($('#slide-edit-template').html());
+    this.template = Handlebars.compile($('#slide-thumb-template').html());
     this.model.on('change', this.updateView, this);
   },
 
@@ -162,6 +162,14 @@ var SlideSetView = Backbone.View.extend({
     $('#slide-set-count').html(this.slideSet.slides.length + ' ' + slideLabel);
     var publishLabel = this.slideSet.get('published') ? 'Un-Publish' : 'Publish';
     $('#publish-button').html(publishLabel);
+
+    // Set src of iframe
+    var viewerHost = 'http://viewer.5lide.com/';
+    if (window.location.hostname == 'localhost') {
+      viewerHost = 'http://localhost:8077/';
+    }
+    $('#slide-preview-iframe').src = viewerHost + 'viewer';
+    
     return this;
   },
 
@@ -186,6 +194,7 @@ var SlideSetView = Backbone.View.extend({
     var slideView = new SlideView({model: slide});
     slideView.render();
     slideView.on(EVENT_SLIDE_SELECTED, this.onActiveSlide, this);
+    slideView.thumbView.onThumbClick();
   },
 
   onActiveSlide: function(slide) {
