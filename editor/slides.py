@@ -181,59 +181,20 @@ class InboxPage(BaseRequestHandler):
 
 
 class SlideSetViewPage(BaseRequestHandler):
-  """Displays a single slide set based on ID.
 
-  If the slide set is not published, we give a 403 unless the user is a
-  collaborator on the list. If it is published, but the user is not a
-  collaborator, we show the more limited HTML view of the slide set rather
-  than the interactive AJAXy edit page.
-  """
-
-  # The different slide set output types we support: content types and
-  # template file extensions
-  _OUTPUT_TYPES = {
-    'pdf': ['application/pdf', 'slide', 'html'],
-    'slide': ['text/html', 'slide', 'html']}
-
-  def get(self):
-    slide_set = SlideSet.get_by_id(int(self.request.get('id')))
+  def get(self, slide_set_id):
+    slide_set = SlideSet.get_by_id(int(slide_set_id))
     if not slide_set:
+      self.error(404)
+      return
+
+    if not (slide_set.current_user_has_access() or slide_set.published):
       self.error(403)
-      return
 
-    # Choose a template based on the output type
-    output_name = self.request.get('output')
-    if output_name not in SlideSetPage._OUTPUT_TYPES:
-      output_name = 'edit'
-    output_type = SlideSetPage._OUTPUT_TYPES[output_name]
-
-    # Validate this user has access to this slide set. If not, they can
-    # access the html view of this set only if it is published.
-    if not slide_set.current_user_has_access() and not slide_set.published:
-      if users.get_current_user():
-        self.error(403)
-      else:
-        self.redirect(users.create_login_url(self.request.uri))
-      return
-    slides = list(slide_set.get_slides().order('index'))
-
-    template_name = 'slideset_%s.%s' % (output_type[1], output_type[2])
-    template_values = {
-        'can_edit': can_edit,
-        'slide_set': slide_set,
-        'slides': slides,
-        'printable': self.request.get('printable')
-        }
-        
-    if output_name == 'pdf':
-      import pdfcred
-      import pdfcrowd
-
-      client = pdfcrowd.Client('pamelafox', pdfcred.password)
-      client.usePrintMedia(True)
-      pdf = client.convertHtml(self.get_html(template_name, template_values), self.response.out)
+    template_name = 'viewer.html'
+    template_values = {'slide_set': slide_set}
       
-    self.response.headers['Content-Type'] = output_type[0]
+    self.response.headers['Content-Type'] = 'text/html'
     self.generate(template_name, template_values)
 
 
@@ -258,7 +219,7 @@ class SlideSetEditPage(BaseRequestHandler):
           self.redirect(users.create_login_url(self.request.uri))
         return
 
-    template_name = 'slideset.html'
+    template_name = 'editor.html'
     template_values = {
         'can_edit': can_edit,
         'slide_set': slide_set

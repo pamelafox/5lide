@@ -39,7 +39,7 @@ var SlideView = Backbone.View.extend({
 
   onThumbClick: function() {
     $('#slide-edit-area').empty().append(this.editView.render().el);
-    this.previewView.updateView();
+    this.previewView.render();
     this.trigger(EVENT_SLIDE_SELECTED, this.model);
   }
 
@@ -121,18 +121,22 @@ var SlidePreviewView = Backbone.View.extend({
   el: '#slide-preview-iframe',
 
   initialize: function() {
-    this.model.bind('change', this.updateView, this);
+    this.$el.attr('src', VIEWER_HOST + 'deckjs/');
+
+    var me = this;
+    this.$el.on('load', function() {
+      me.render();
+    });
+
+    this.model.bind('change', this.render, this);
   },
 
   render: function() {
-    this.updateView();
-    return this;
-  },
-
-  updateView: function() {
-    this.$el.attr('srcdoc', this.model.get('content'));
+    var $window = this.$el[0].contentWindow;
+    $window.postMessage([this.model.toJSON()], 'http://localhost:8077');
     return this;
   }
+
 });
 
 var SlideSetView = Backbone.View.extend({

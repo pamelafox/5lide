@@ -80,7 +80,7 @@ var SlideSet = Backbone.Model.extend({
     delete resp.slides;
     return resp;
   }
-
+  
 });
 
 var SlideSetCollection = Backbone.Collection.extend({
@@ -104,3 +104,9 @@ var Inbox = Backbone.Model.extend({
   }
 
 });
+
+
+var VIEWER_HOST = 'http://viewer.5lide.com/';
+if (window.location.hostname == 'localhost') {
+  VIEWER_HOST  = 'http://localhost:8077/';
+}
