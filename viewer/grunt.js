@@ -12,7 +12,7 @@ module.exports = function(grunt) {
       css: {
         src: [CSS_DIR + 'app/*.css'],
         dest: BUILD_DIR + 'css/viewer.css'
-      },=
+      },
     },
     cssmin: {
       css: {

@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/common/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="/fathomjs/css/fathom.css" />
+    <link rel="stylesheet" type="text/css" href="/common/css/prettify.css" />
+    <script src="/common/js/jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="/fathomjs/js/fathom.js"></script>
+    <script src="/common/js/prettify.js"></script>
+    <script>
+    </script>
+  </head>
+  <body>
+
+    <div id="presentation">
+
+    </div>
+
+    <script>
+    // Receive slides on postMessage
+    var slides = ['<h1>Loading...</h1>'];
+
+    function renderSlides(slides) {
+      $('#presentation').empty();
+      $.each(slides, function(index, slideHTML) {
+        var $slide = $('<div class="slide"></div>');
+        $slide.html(slideHTML);
+        $('#presentation').append($slide);
+      });
+      
+      $('pre').addClass('prettyprint').attr('tabIndex', 0);
+      prettyPrint();
+
+      var fathom = $('#presentation').fathom({
+        portable: (window.top !== window.self),
+        onActivateSlide: function() {
+          var $slide = $(this);
+          $slide.find('pre:first').focus();
+        }
+      });
+    }
+
+    window.addEventListener('message',function(event) {
+      renderSlides(event.data);
+    },false);
+
+    renderSlides(slides);
+    </script>
+  </body>
+</html>

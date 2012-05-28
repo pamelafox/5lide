@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html style="height:100%;">
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="viewport" content="width=1024, user-scalable=no">
+	<link rel="stylesheet" href="/deckjs/css/deck.core.css" type="text/css">
+	<!-- Options -->
+
+	<!-- Theme (only one) -->
+	<link rel="stylesheet" id="style-theme-link" href="/deckjs/themes/style/web-2.0.css">
+	<!-- Transition (only one) -->
+	<link rel="stylesheet" id="transition-theme-link" href="/deckjs/themes/transition/horizontal-slide.css">
+
+	<!-- Extensions (can be many) -->
+	<link rel="stylesheet" href="/deckjs/extensions/status/deck.status.css">
+	<link rel="stylesheet" href="/deckjs/extensions/scale/deck.scale.css">
+	<link rel="stylesheet" href="/deckjs/extensions/navigation/deck.navigation.css">
+
+	<script src="/deckjs/js/modernizr.custom.js"></script>
+</head>
+
+<body class="deck-container" style="height:100%;">
+
+
+	<!-- For navigation -->
+	<a href="#" class="deck-prev-link" title="Previous">&#8592;</a>
+	<a href="#" class="deck-next-link" title="Next">&#8594;</a>
+	<!-- /navigation -->
+
+	<!-- For status -->
+	<p class="deck-status">
+		<span class="deck-status-current"></span>
+		/
+		<span class="deck-status-total"></span>
+	</p>
+	<!-- /status -->
+
+<script src="/common/js/jquery-1.7.2.min.js"></script>
+<script src="/deckjs/js/deck.core.js"></script>
+
+<!-- Extensions (can be many) -->
+<script src="/deckjs/extensions/status/deck.status.js"></script>
+<script src="/deckjs/extensions/scale/deck.scale.js"></script>
+<script src="/deckjs/extensions/navigation/deck.navigation.js"></script>
+
+<script>
+var slides = ['<h1>Loading...</h1>', 'second slide'];
+
+function renderSlides(slides) {
+  $('.slide').remove();
+  $.each(slides, function(index, slide) {
+    var $slide = $('<section class="slide"></section>');
+    $slide.html(slide.content);
+    $('body').append($slide);
+  });
+  $.deck('.slide');
+}
+
+window.addEventListener('message',function(event) {
+  renderSlides(event.data);
+},false);
+
+renderSlides(slides);
+</script>
+</body>
+</html>

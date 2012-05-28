@@ -8,5 +8,19 @@ handlers:
   static_files: favicon.ico
   upload: favicon.ico
 
+- url: /deckjs/
+  static_files: deckjs/index.html
+  upload: deckjs/index.html
+
+- url: /deckjs
+  static_dir: deckjs
+
+- url: /fathomjs/
+  static_files: fathomjs/index.html
+  upload: fathomjs/index.html
+
 - url: /fathomjs
   static_dir: fathomjs
+
+- url: /common
+  static_dir: common
