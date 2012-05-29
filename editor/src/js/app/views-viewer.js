@@ -7,7 +7,7 @@ SL.views.viewer = (function() {
     el: $('#viewer-iframe'),
 
     initialize: function() {
-      this.$el.attr('src', SL.VIEWER_HOST + 'deckjs/');
+      this.$el.attr('src', SL.VIEWER_HOST + '/deckjs/');
 
       var me = this;
       this.$el.on('load', function() {

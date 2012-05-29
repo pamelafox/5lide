@@ -114,7 +114,7 @@ SL.views.editor = (function() {
     el: '#slide-preview-iframe',
 
     initialize: function() {
-      this.$el.attr('src', SL.VIEWER_HOST + 'deckjs/');
+      this.$el.attr('src', SL.VIEWER_HOST + '/deckjs/');
 
       var me = this;
       this.$el.on('load', function() {
@@ -126,7 +126,7 @@ SL.views.editor = (function() {
 
     render: function() {
       var $window = this.$el[0].contentWindow;
-      $window.postMessage([this.model.toJSON()], 'http://localhost:8077');
+      $window.postMessage([this.model.toJSON()], SL.VIEWER_HOST);
       return this;
     }
 
@@ -159,8 +159,6 @@ SL.views.editor = (function() {
       $('#slide-set-count').html(this.slideSet.slides.length + ' ' + slideLabel);
       var publishLabel = this.slideSet.get('published') ? 'Un-Publish' : 'Publish';
       $('#publish-button').html(publishLabel);
-
-      $('#slide-preview-iframe').src = SL.VIEWER_HOST + 'viewer';
       
       return this;
     },

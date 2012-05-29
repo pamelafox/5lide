@@ -8,6 +8,18 @@ libraries:
 - name: jinja2
   version: "2.6"
 
+skip_files:
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^node_modules/.*
+
 handlers:
 - url: /favicon.ico
   static_files: favicon.ico

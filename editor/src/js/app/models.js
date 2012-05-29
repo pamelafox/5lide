@@ -118,7 +118,7 @@ SL.models = (function() {
 
 }());
 
-SL.VIEWER_HOST = 'http://viewer.5lide.com/';
+SL.VIEWER_HOST = 'http://5lide-viewer.appspot.com';
 if (window.location.hostname === 'localhost') {
-  SL.VIEWER_HOST  = 'http://localhost:8077/';
+  SL.VIEWER_HOST  = 'http://localhost:8077';
 }

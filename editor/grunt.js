@@ -2,55 +2,14 @@
 
 module.exports = function(grunt) {
 
-  var CSS_DIR   = 'src/css/';
-  var JS_DIR    = 'src/js/';
-  var BUILD_DIR = '';
+  var SRC_CSS   = 'src/css/';
+  var SRC_JS    = 'src/js/';
+  var BUILD_CSS = 'css/';
+  var BUILD_JS  = 'js/';
   
-  // Project configuration.
   grunt.initConfig({
     lint: {
-      files: [JS_DIR + 'app/**/*.js']
-    },
-    less: {
-      css: {
-        src: [CSS_DIR + 'less/base.less'],
-        dest: CSS_DIR + 'app/base.css',
-      }
-    },
-    concat: {
-      css: {
-        src: [CSS_DIR + 'libs/*.css',
-              CSS_DIR + 'app/*.css'],
-        dest: BUILD_DIR + 'css/all.css'
-      },
-      js: {
-        src: [JS_DIR + 'libs/zepto.js',
-              JS_DIR + 'libs/zepto-mods.js',
-              JS_DIR + 'libs/zepto-data.js',
-              JS_DIR + 'libs/bootstrap.js',
-              JS_DIR + 'libs/underscore.js',
-              JS_DIR + 'libs/backbone.js',
-              JS_DIR + 'libs/handlebars.js',
-              JS_DIR + 'libs/timeago.js',
-              JS_DIR + 'app/models.js'],
-        dest: BUILD_DIR + 'js/all.js'
-      },
-    },
-    min: {
-      js: {
-        src: '<config:concat.js.dest>',
-        dest: BUILD_DIR + 'js/all-min.js'
-      }
-    },
-    cssmin: {
-      css: {
-        src: '<config:concat.css.dest>',
-        dest: BUILD_DIR + 'css/all-min.css'
-      }
-    },
-    watch: {
-      files: '<config:lint.files>',
-      tasks: 'lint'
+      files: [SRC_JS + 'app/**/*.js']
     },
     jshint: {
       options: {
@@ -71,6 +30,47 @@ module.exports = function(grunt) {
                 '_': true,
                 '$': true,
                 'SL': true}
+    },
+    less: {
+      css: {
+        src: [SRC_CSS + 'less/base.less'],
+        dest: SRC_CSS + 'app/base.css',
+      }
+    },
+    concat: {
+      css: {
+        src: [SRC_CSS + 'libs/*.css',
+              SRC_CSS + 'app/*.css'],
+        dest: BUILD_CSS + 'css/all.css'
+      },
+      js: {
+        src: [SRC_JS + 'libs/zepto.js',
+              SRC_JS + 'libs/zepto-mods.js',
+              SRC_JS + 'libs/zepto-data.js',
+              SRC_JS + 'libs/bootstrap.js',
+              SRC_JS + 'libs/underscore.js',
+              SRC_JS + 'libs/backbone.js',
+              SRC_JS + 'libs/handlebars.js',
+              SRC_JS + 'libs/timeago.js',
+              SRC_JS + 'app/models.js'],
+        dest: BUILD_JS + 'js/all.js'
+      },
+    },
+    jsmin: {
+      js: {
+        src: '<config:concat.js.dest>',
+        dest: BUILD_JS + 'js/all-min.js'
+      }
+    },
+    cssmin: {
+      css: {
+        src: '<config:concat.css.dest>',
+        dest: BUILD_CSS + 'css/all-min.css'
+      }
+    },
+    watch: {
+      files: '<config:lint.files>',
+      tasks: 'lint'
     }
   });
 
@@ -78,6 +78,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-css');
 
   // Default task.
-  grunt.registerTask('default', 'lint less concat min cssmin');
+  grunt.registerTask('default', 'lint less concat jsmin cssmin');
 
 };
