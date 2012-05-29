@@ -1,112 +1,124 @@
-var Slide = Backbone.Model.extend({
+var SL = SL || {};
 
-  defaults: function() {
-    return {
-      setId: null,
-      title: 'Untitled',
-      content: ''
-    };
-  },
+SL.models = (function() {
 
-  url : function() {
-    if (this.id) {
-      return '/api/sets/' + this.get('setId') + '/slides/' + this.id;
-    } else {
-      return '/api/sets/' + this.get('setId') + '/slides';
+  var Slide = Backbone.Model.extend({
+
+    defaults: function() {
+      return {
+        setId: null,
+        title: 'Untitled',
+        content: ''
+      };
+    },
+
+    url : function() {
+      if (this.id) {
+        return '/api/sets/' + this.get('setId') + '/slides/' + this.id;
+      } else {
+        return '/api/sets/' + this.get('setId') + '/slides';
+      }
+    },
+
+    initialize: function() {
+      this.on('change:content', this.updateTitle, this);
+      this.on('remove', this.remove, this);
+      this.updateTitle();
+    },
+
+    remove: function() {
+      this.destroy();
+    },
+
+    updateTitle: function() {
+      var $contentAsHtml = $('<div>' + this.get('content') + '</div>');
+      var autoTitle = $contentAsHtml.find('h1').text();
+      if (!autoTitle) {
+        autoTitle = $.trim(this.get('content') || '').split(' ')[0];
+      }
+      if (!autoTitle) {
+        autoTitle = 'Untitled';
+      }
+      this.set({'title': autoTitle});
     }
-  },
+  });
 
-  initialize: function() {
-    this.on('change:content', this.updateTitle, this);
-    this.on('remove', this.remove, this);
-    this.updateTitle();
-  },
+  var SlideCollection = Backbone.Collection.extend({
+    model: Slide
+  });
 
-  remove: function() {
-    this.destroy();
-  },
+  var SlideSet = Backbone.Model.extend({
 
-  updateTitle: function() {
-    var $contentAsHtml = $('<div>' + this.get('content') + '</div>');
-    var autoTitle = $contentAsHtml.find('h1').text();
-    if (!autoTitle) {
-      autoTitle = $.trim(this.get('content') || '').split(' ')[0];
+    /*
+     id
+     title
+     slides
+     slideIds
+     format
+     theme
+     published
+     updated
+     */
+    defaults: function() {
+      return {
+        title: 'Untitled'
+      };
+    },
+
+    url : function() {
+      if (this.id) {
+        return '/api/sets/' + this.id;
+      } else {
+        return '/api/sets';
+      }
+    },
+   
+    // {slides: [{}, {}]}
+    initialize : function() {
+      this.slides = new SlideCollection();
+    },
+
+    parse: function(resp) {
+      this.slides.reset(resp.slides);
+      delete resp.slides;
+      return resp;
     }
-    if (!autoTitle) {
-      autoTitle = 'Untitled';
+    
+  });
+
+  var SlideSetCollection = Backbone.Collection.extend({
+    model: SlideSet
+  });
+
+  var Inbox = Backbone.Model.extend({
+
+    url: function() {
+      return '/api/inbox';
+    },
+
+    initialize: function() {
+      this.slidesets = new SlideSetCollection();
+    },
+
+    parse: function(resp) {
+      this.slidesets.reset(resp.slidesets);
+      delete resp.slidesets;
+      return resp;
     }
-    console.log(autoTitle);
-    this.set({'title': autoTitle});
-  }
-});
 
-var SlideCollection = Backbone.Collection.extend({
-  model: Slide
-});
+  });
 
-var SlideSet = Backbone.Model.extend({
+  return {
+    'Slide': Slide,
+    'SlideCollection': SlideCollection,
+    'SlideSet': SlideSet,
+    'SlideSetCollection': SlideSetCollection,
+    'Inbox': Inbox
+  };
 
-  /*
-   id
-   title
-   slides
-   slideIds
-   format
-   theme
-   published
-   updated
-   */
-  defaults: function() {
-    return {
-      title: 'Untitled'
-    };
-  },
+}());
 
-  url : function() {
-    if (this.id) {
-      return '/api/sets/' + this.id;
-    } else {
-      return '/api/sets';
-    }
-  },
- 
-  // {slides: [{}, {}]}
-  initialize : function() {
-    this.slides = new SlideCollection();
-  },
-
-  parse: function(resp) {
-    this.slides.reset(resp.slides);
-    delete resp.slides;
-    return resp;
-  }
-  
-});
-
-var SlideSetCollection = Backbone.Collection.extend({
-  model: SlideSet
-});
-
-var Inbox = Backbone.Model.extend({
-
-  url: function() {
-    return '/api/inbox';
-  },
-
-  initialize: function() {
-    this.slidesets = new SlideSetCollection();
-  },
-
-  parse: function(resp) {
-    this.slidesets.reset(resp.slidesets);
-    delete resp.slidesets;
-    return resp;
-  }
-
-});
-
-
-var VIEWER_HOST = 'http://viewer.5lide.com/';
-if (window.location.hostname == 'localhost') {
-  VIEWER_HOST  = 'http://localhost:8077/';
+SL.VIEWER_HOST = 'http://viewer.5lide.com/';
+if (window.location.hostname === 'localhost') {
+  SL.VIEWER_HOST  = 'http://localhost:8077/';
 }

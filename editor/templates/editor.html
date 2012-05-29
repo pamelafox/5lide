@@ -99,9 +99,9 @@
 {% endblock %}
 
 {% block bottomscript %}
-<script src="/src/js/app/views-editor.js" type="text/javascript"></script>
+<script src="/src/js/app/views-editor.js?version={{ version }}" type="text/javascript"></script>
 {% endblock %}
 
 {% block readyscript %}
-new SlideSetView();
+new SL.views.editor.SlideSetView();
 {% endblock %}

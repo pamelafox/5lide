@@ -19,11 +19,20 @@ module.exports = function(grunt) {
     },
     concat: {
       css: {
-        src: [CSS_DIR + 'libs/*.css', CSS_DIR + 'app/*.css'],
+        src: [CSS_DIR + 'libs/*.css',
+              CSS_DIR + 'app/*.css'],
         dest: BUILD_DIR + 'css/all.css'
       },
       js: {
-        src: [JS_DIR + 'libs/zepto.js', JS_DIR + 'libs/zepto-mods.js',  JS_DIR + 'libs/zepto-data.js', JS_DIR + 'libs/bootstrap.js', JS_DIR + 'libs/closure-all.js', JS_DIR + 'app/*.js'],
+        src: [JS_DIR + 'libs/zepto.js',
+              JS_DIR + 'libs/zepto-mods.js',
+              JS_DIR + 'libs/zepto-data.js',
+              JS_DIR + 'libs/bootstrap.js',
+              JS_DIR + 'libs/underscore.js',
+              JS_DIR + 'libs/backbone.js',
+              JS_DIR + 'libs/handlebars.js',
+              JS_DIR + 'libs/timeago.js',
+              JS_DIR + 'app/models.js'],
         dest: BUILD_DIR + 'js/all.js'
       },
     },
@@ -57,15 +66,18 @@ module.exports = function(grunt) {
         eqnull: true,
         browser: true
       },
-      globals: {'goog': true}
-    },
-    uglify: {}
+      globals: {'Backbone': true,
+                'Handlebars': true,
+                '_': true,
+                '$': true,
+                'SL': true}
+    }
   });
 
-  grunt.loadNpmTasks('/usr/local/lib/node_modules/grunt-less');
-  grunt.loadNpmTasks('/usr/local/lib/node_modules/grunt-css');
+  grunt.loadNpmTasks('grunt-less');
+  grunt.loadNpmTasks('grunt-css');
 
   // Default task.
-  grunt.registerTask('default', 'less concat min cssmin');
+  grunt.registerTask('default', 'lint less concat min cssmin');
 
 };

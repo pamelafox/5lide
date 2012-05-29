@@ -89,10 +89,10 @@
 {% endblock %}
 
 {% block bottomscript %}
-<script src="/src/js/app/views-inbox.js" type="text/javascript"></script>
+<script src="/src/js/app/views-inbox.js?version={{ version }}" type="text/javascript"></script>
 {% endblock %}
 
 {% block readyscript %}
  {{ super() }}
- new InboxView();
+ new SL.views.inbox.InboxView();
 {% endblock %}

@@ -12,9 +12,9 @@ html, body {
 {% endblock %}
 
 {% block bottomscript %}
-<script src="/src/js/app/views-viewer.js" type="text/javascript"></script>
+<script src="/src/js/app/views-viewer.js?version={{ version }}" type="text/javascript"></script>
 {% endblock %}
 
 {% block readyscript %}
-new SlideSetView();
+new SL.views.viewer.SlideSetView();
 {% endblock %}

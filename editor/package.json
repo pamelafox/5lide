@@ -1,0 +1,9 @@
+{
+  "name": "SlideEditor",
+  "version": "0.0.0",
+  "dependencies" : {
+    "grunt-less":  ">0.0.0",
+    "grunt-css":   ">0.0.0"
+  }
+}
+

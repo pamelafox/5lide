@@ -41,6 +41,14 @@ _DEBUG = True
 def is_devserver():
     return os.environ['SERVER_SOFTWARE'].startswith('Dev')
 
+
+def get_version():
+    if is_devserver():
+        return 'devserver'
+    else:
+        return os.environ.get('CURRENT_VERSION_ID')
+
+
 # Returns unix time stamp
 def datetime_to_timestamp(datetime):
     import calendar
@@ -160,13 +168,25 @@ class BaseRequestHandler(webapp2.RequestHandler):
     self.response.write(self.get_html(template_name, template_values))
     
   def get_html(self, template_name, template_values={}):
+
+    # Start off in debug on devserver, and not on prod
+    is_debug = is_devserver()
+    debug = self.request.get('debug')
+    # But always allow override via debug param
+    if debug:
+      if debug == 'true':
+        is_debug = True
+      else:
+        is_debug = False
+    
     values = {
         'request': self.request,
         'user': users.get_current_user(),
         'login_url': users.create_login_url(self.request.uri),
         'logout_url': users.create_logout_url('http://%s/' % (
             self.request.host,)),
-        'debug': is_devserver(),
+        'debug': is_debug,
+        'version': get_version(),
         }
     values.update(template_values)
     return self.jinja2.render_template(template_name, **values)
